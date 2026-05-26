@@ -18,22 +18,24 @@ model User {
 }
 
 model EquipmentType {
-  id      Int       @id @default(autoincrement())
-  name    String    @unique
-  icon    String
-  rentals Rental[]
+  id              Int              @id @default(autoincrement())
+  name            String           @unique
+  icon            String
+  rentals         Rental[]
+  transportations Transportation[]
 }
 
 model Request {
-  id          Int           @id @default(autoincrement())
-  type        RequestType
-  paymentType PaymentType
-  status      RequestStatus @default(PENDING)
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  userId      Int
-  user        User          @relation(fields: [userId], references: [id])
-  rental      Rental?
+  id             Int            @id @default(autoincrement())
+  type           RequestType
+  paymentType    PaymentType
+  status         RequestStatus  @default(PENDING)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  userId         Int
+  user           User           @relation(fields: [userId], references: [id])
+  rental         Rental?
+  transportation Transportation?
 }
 
 model Rental {
@@ -47,6 +49,23 @@ model Rental {
   lng             Decimal?      @db.Decimal(10, 7)
   startsAt        DateTime
   durationDays    Int
+}
+
+model Transportation {
+  id              Int           @id @default(autoincrement())
+  requestId       Int           @unique
+  request         Request       @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  equipmentTypeId Int
+  equipmentType   EquipmentType @relation(fields: [equipmentTypeId], references: [id])
+  cargo           String
+  fromAddress     String
+  fromLat         Decimal?      @db.Decimal(10, 7)
+  fromLng         Decimal?      @db.Decimal(10, 7)
+  toAddress       String
+  toLat           Decimal?      @db.Decimal(10, 7)
+  toLng           Decimal?      @db.Decimal(10, 7)
+  startsAt        DateTime
+  ratePerHour     Decimal       @db.Decimal(10, 2)
 }
 
 enum RequestType {
