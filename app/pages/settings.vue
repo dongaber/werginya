@@ -1,11 +1,86 @@
 <template>
-  <div class="page">
-    <h1>Настройки</h1>
+  <div class="settings">
+    <h1 class="settings__title">Настройки</h1>
+
+    <div class="settings__group">
+      <NuxtLink
+        v-for="item in items"
+        :key="item.to"
+        :to="item.to"
+        class="settings__item"
+      >
+        <span class="settings__item-icon" v-html="item.icon" />
+        <span class="settings__item-label">{{ item.label }}</span>
+        <span class="settings__item-arrow">›</span>
+      </NuxtLink>
+    </div>
   </div>
 </template>
 
+<script setup lang="ts">
+const items = [
+  {
+    to: '/equipment-types',
+    label: 'Виды техники',
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
+      <path fill="currentColor" d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2m-7 3a3 3 0 0 1 3 3 3 3 0 0 1-3 3 3 3 0 0 1-3-3 3 3 0 0 1 3-3m6 13H6v-1c0-2 4-3.1 6-3.1s6 1.1 6 3.1z"/>
+    </svg>`,
+  },
+]
+</script>
+
 <style scoped>
-.page {
+.settings {
   padding: 16px;
+}
+
+.settings__title {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 24px;
+  color: var(--tg-text);
+}
+
+.settings__group {
+  background: var(--tg-secondary-bg);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.settings__item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  text-decoration: none;
+  color: var(--tg-text);
+  border-bottom: 1px solid color-mix(in srgb, var(--tg-hint) 15%, transparent);
+  transition: opacity 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.settings__item:last-child {
+  border-bottom: none;
+}
+
+.settings__item:active {
+  opacity: 0.6;
+}
+
+.settings__item-icon {
+  display: flex;
+  color: var(--tg-button);
+  flex-shrink: 0;
+}
+
+.settings__item-label {
+  flex: 1;
+  font-size: 16px;
+}
+
+.settings__item-arrow {
+  color: var(--tg-hint);
+  font-size: 20px;
+  line-height: 1;
 }
 </style>
