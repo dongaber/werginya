@@ -18,14 +18,25 @@ model User {
 }
 
 model Request {
-  id          Int           @id @default(autoincrement())
-  title       String
-  description String?
-  status      RequestStatus @default(PENDING)
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  id          Int             @id @default(autoincrement())
+  type        RequestType
+  paymentType PaymentType
+  status      RequestStatus   @default(PENDING)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
   userId      Int
-  user        User          @relation(fields: [userId], references: [id])
+  user        User            @relation(fields: [userId], references: [id])
+}
+
+enum RequestType {
+  RENTAL
+  TRANSPORTATION
+  DELIVERY
+}
+
+enum PaymentType {
+  CASH
+  NON_CASH
 }
 
 enum RequestStatus {
