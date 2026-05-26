@@ -15,7 +15,12 @@ export default defineEventHandler(async (event) => {
     userId = user.id
   }
 
-  const { type, paymentType, rental, transportation, delivery } = body
+  const { type, paymentType, rental, transportation, delivery, contactPhone, contactTelegram, contactWhatsapp } = body
+  const contacts = {
+    ...(contactPhone && { contactPhone }),
+    ...(contactTelegram && { contactTelegram }),
+    ...(contactWhatsapp && { contactWhatsapp }),
+  }
 
   if (type === 'RENTAL') {
     if (!rental) throw createError({ statusCode: 400, message: 'rental data required' })
@@ -25,7 +30,7 @@ export default defineEventHandler(async (event) => {
     }
     const data = await prisma.request.create({
       data: {
-        type, paymentType, userId,
+        type, paymentType, userId, ...contacts,
         rental: { create: { equipmentTypeId, address, lat, lng, startsAt: new Date(startsAt), durationDays } },
       },
       include: requestInclude,
@@ -41,7 +46,7 @@ export default defineEventHandler(async (event) => {
     }
     const data = await prisma.request.create({
       data: {
-        type, paymentType, userId,
+        type, paymentType, userId, ...contacts,
         transportation: { create: { equipmentTypeId, cargo, fromAddress, fromLat, fromLng, toAddress, toLat, toLng, startsAt: new Date(startsAt), ratePerHour } },
       },
       include: requestInclude,
@@ -57,7 +62,7 @@ export default defineEventHandler(async (event) => {
     }
     const data = await prisma.request.create({
       data: {
-        type, paymentType, userId,
+        type, paymentType, userId, ...contacts,
         delivery: { create: { cargo, toAddress, toLat, toLng, startsAt: new Date(startsAt), volume } },
       },
       include: requestInclude,
