@@ -2,9 +2,21 @@
   <AppPreloader />
   <NuxtRouteAnnouncer />
   <NuxtLayout>
-    <NuxtPage />
+    <NuxtPage :transition="pageTransition" />
   </NuxtLayout>
 </template>
+
+<script setup lang="ts">
+const route = useRoute()
+
+const pageTransition = computed(() => {
+  const isSettingsSub = route.path.startsWith('/settings/') && route.path !== '/settings'
+  return {
+    name: isSettingsSub ? 'slide-right' : 'page',
+    mode: 'out-in' as const,
+  }
+})
+</script>
 
 <style>
 :root {
@@ -36,9 +48,7 @@ body {
 
 .page-enter-active,
 .page-leave-active {
-  transition:
-    opacity 0.2s ease,
-    transform 0.2s ease;
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
 .page-enter-from {
@@ -49,5 +59,20 @@ body {
 .page-leave-to {
   opacity: 0;
   transform: translateY(-8px);
+}
+
+.slide-right-enter-active,
+.slide-right-leave-active {
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+.slide-right-enter-from {
+  opacity: 0;
+  transform: translateX(48px);
+}
+
+.slide-right-leave-to {
+  opacity: 0;
+  transform: translateX(-24px);
 }
 </style>
