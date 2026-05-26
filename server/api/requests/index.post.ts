@@ -3,9 +3,19 @@ export default defineEventHandler(async (event) => {
 
   if (!body?.type) throw createError({ statusCode: 400, message: 'type is required' })
   if (!body?.paymentType) throw createError({ statusCode: 400, message: 'paymentType is required' })
-  if (!body?.userId) throw createError({ statusCode: 400, message: 'userId is required' })
+  if (!body?.telegramId && !body?.userId) throw createError({ statusCode: 400, message: 'telegramId or userId is required' })
 
-  const { type, paymentType, userId, rental, transportation, delivery } = body
+  let userId: number = body.userId
+  if (body.telegramId) {
+    const user = await prisma.user.upsert({
+      where: { telegramId: BigInt(body.telegramId) },
+      update: {},
+      create: { telegramId: BigInt(body.telegramId), firstName: 'User' },
+    })
+    userId = user.id
+  }
+
+  const { type, paymentType, rental, transportation, delivery } = body
 
   if (type === 'RENTAL') {
     if (!rental) throw createError({ statusCode: 400, message: 'rental data required' })
