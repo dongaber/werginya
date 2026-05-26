@@ -7,11 +7,14 @@
 </template>
 
 <script setup lang="ts">
-const props = defineProps<{ title: string; back?: boolean }>()
+defineProps<{ title: string; back?: boolean }>()
+const emit = defineEmits<{ back: [] }>()
+const attrs = useAttrs()
 const router = useRouter()
 
 function onBack() {
-  router.back()
+  emit('back')
+  if (!attrs.onBack) router.back()
 }
 </script>
 
