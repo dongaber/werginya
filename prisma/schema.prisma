@@ -26,16 +26,17 @@ model EquipmentType {
 }
 
 model Request {
-  id             Int            @id @default(autoincrement())
+  id             Int             @id @default(autoincrement())
   type           RequestType
   paymentType    PaymentType
-  status         RequestStatus  @default(PENDING)
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
+  status         RequestStatus   @default(PENDING)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
   userId         Int
-  user           User           @relation(fields: [userId], references: [id])
+  user           User            @relation(fields: [userId], references: [id])
   rental         Rental?
   transportation Transportation?
+  delivery       Delivery?
 }
 
 model Rental {
@@ -66,6 +67,18 @@ model Transportation {
   toLng           Decimal?      @db.Decimal(10, 7)
   startsAt        DateTime
   ratePerHour     Decimal       @db.Decimal(10, 2)
+}
+
+model Delivery {
+  id        Int      @id @default(autoincrement())
+  requestId Int      @unique
+  request   Request  @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  cargo     String
+  toAddress String
+  toLat     Decimal? @db.Decimal(10, 7)
+  toLng     Decimal? @db.Decimal(10, 7)
+  startsAt  DateTime
+  volume    String
 }
 
 enum RequestType {
