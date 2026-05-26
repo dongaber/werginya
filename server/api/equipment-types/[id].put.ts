@@ -1,4 +1,5 @@
 export default defineEventHandler(async (event) => {
+  await requireAdmin(event)
   const id = Number(getRouterParam(event, 'id'))
   const body = await readBody<{ name?: string; icon?: string }>(event)
 

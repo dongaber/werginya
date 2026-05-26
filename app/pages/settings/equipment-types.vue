@@ -59,6 +59,9 @@
 </template>
 
 <script setup lang="ts">
+const { $apiFetch } = useNuxtApp()
+const { error: showError, success: showSuccess } = useToast()
+
 const { data, pending, refresh } = await useFetch<{ id: number; name: string; icon: string }[]>(
   '/api/equipment-types'
 )
@@ -88,18 +91,21 @@ async function save() {
   saving.value = true
   try {
     if (editing.value) {
-      await $fetch(`/api/equipment-types/${editing.value}`, {
+      await ($apiFetch as typeof $fetch)(`/api/equipment-types/${editing.value}`, {
         method: 'PUT',
         body: { name: form.name, icon: form.icon },
       })
     } else {
-      await $fetch('/api/equipment-types', {
+      await ($apiFetch as typeof $fetch)('/api/equipment-types', {
         method: 'POST',
         body: { name: form.name, icon: form.icon },
       })
     }
     await refresh()
     modal.value = false
+    showSuccess('Сохранено')
+  } catch {
+    showError('Не удалось сохранить. Попробуйте ещё раз.')
   } finally {
     saving.value = false
   }
@@ -113,9 +119,12 @@ async function confirmDelete() {
   if (confirmId.value === null) return
   saving.value = true
   try {
-    await $fetch(`/api/equipment-types/${confirmId.value}`, { method: 'DELETE' })
+    await ($apiFetch as typeof $fetch)(`/api/equipment-types/${confirmId.value}`, { method: 'DELETE' })
     await refresh()
     confirmId.value = null
+    showSuccess('Удалено')
+  } catch {
+    showError('Не удалось удалить. Попробуйте ещё раз.')
   } finally {
     saving.value = false
   }

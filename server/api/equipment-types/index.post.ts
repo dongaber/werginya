@@ -1,4 +1,5 @@
 export default defineEventHandler(async (event) => {
+  await requireAdmin(event)
   const body = await readBody<{ name: string; icon: string }>(event)
 
   if (!body?.name?.trim() || !body?.icon?.trim()) {
