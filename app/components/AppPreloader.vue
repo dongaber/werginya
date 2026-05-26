@@ -1,7 +1,7 @@
 <template>
   <Transition name="preloader">
     <div v-if="visible" class="preloader">
-      <div class="preloader__spinner" />
+      <AppSpinner :size="36" />
     </div>
   </Transition>
 </template>
@@ -23,19 +23,6 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   background-color: var(--tg-bg);
-}
-
-.preloader__spinner {
-  width: 36px;
-  height: 36px;
-  border: 3px solid color-mix(in srgb, var(--tg-button) 20%, transparent);
-  border-top-color: var(--tg-button);
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
 }
 
 .preloader-leave-active {

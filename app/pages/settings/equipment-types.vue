@@ -1,13 +1,13 @@
 <template>
   <div class="page">
-    <div class="page__header">
-      <button class="page__back" @click="router.back()">‹</button>
-      <h1 class="page__title">Виды техники</h1>
-      <button class="page__add" @click="openCreate">+</button>
-    </div>
+    <AppPageHeader title="Виды техники" back>
+      <template #actions>
+        <button class="add-btn" @click="openCreate">+</button>
+      </template>
+    </AppPageHeader>
 
-    <div v-if="pending" class="page__loader">
-      <div class="spinner" />
+    <div v-if="pending" class="loader">
+      <AppSpinner :size="32" />
     </div>
 
     <div v-else class="list">
@@ -29,51 +29,36 @@
       </div>
     </div>
 
-    <!-- Form modal -->
-    <Transition name="modal">
-      <div v-if="modal" class="modal-backdrop" @click.self="closeModal">
-        <div class="modal">
-          <h2 class="modal__title">{{ editing ? 'Редактировать' : 'Добавить' }}</h2>
-          <div class="modal__field">
-            <label class="modal__label">Название</label>
-            <input v-model="form.name" class="modal__input" placeholder="Экскаватор" />
-          </div>
-          <div class="modal__field">
-            <label class="modal__label">Иконка (URL)</label>
-            <input v-model="form.icon" class="modal__input" placeholder="https://..." />
-            <img v-if="form.icon" :src="form.icon" class="modal__preview" />
-          </div>
-          <div class="modal__actions">
-            <button class="modal__btn modal__btn--cancel" @click="closeModal">Отмена</button>
-            <button class="modal__btn modal__btn--save" :disabled="saving" @click="save">
-              {{ saving ? '...' : 'Сохранить' }}
-            </button>
-          </div>
-        </div>
+    <AppBottomSheet v-model="modal">
+      <h2 class="sheet-title">{{ editing ? 'Редактировать' : 'Добавить' }}</h2>
+      <AppFormField label="Название">
+        <input v-model="form.name" class="input" placeholder="Экскаватор" />
+      </AppFormField>
+      <AppFormField label="Иконка (URL)">
+        <input v-model="form.icon" class="input" placeholder="https://..." />
+        <img v-if="form.icon" :src="form.icon" class="icon-preview" />
+      </AppFormField>
+      <div class="sheet-actions">
+        <button class="btn btn--cancel" @click="modal = false">Отмена</button>
+        <button class="btn btn--save" :disabled="saving" @click="save">
+          {{ saving ? '...' : 'Сохранить' }}
+        </button>
       </div>
-    </Transition>
+    </AppBottomSheet>
 
-    <!-- Confirm delete modal -->
-    <Transition name="modal">
-      <div v-if="confirmId !== null" class="modal-backdrop" @click.self="confirmId = null">
-        <div class="modal">
-          <h2 class="modal__title">Удалить вид техники?</h2>
-          <p class="modal__text">Это действие нельзя отменить.</p>
-          <div class="modal__actions">
-            <button class="modal__btn modal__btn--cancel" @click="confirmId = null">Отмена</button>
-            <button class="modal__btn modal__btn--delete" :disabled="saving" @click="confirmDelete">
-              {{ saving ? '...' : 'Удалить' }}
-            </button>
-          </div>
-        </div>
-      </div>
-    </Transition>
+    <AppConfirmModal
+      :model-value="confirmId !== null"
+      title="Удалить вид техники?"
+      message="Это действие нельзя отменить."
+      confirm-label="Удалить"
+      :loading="saving"
+      @confirm="confirmDelete"
+      @update:model-value="confirmId = null"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-const router = useRouter()
-
 const { data, pending, refresh } = await useFetch<{ id: number; name: string; icon: string }[]>(
   '/api/equipment-types'
 )
@@ -98,10 +83,6 @@ function openEdit(item: { id: number; name: string; icon: string }) {
   modal.value = true
 }
 
-function closeModal() {
-  modal.value = false
-}
-
 async function save() {
   if (!form.name.trim() || !form.icon.trim()) return
   saving.value = true
@@ -118,7 +99,7 @@ async function save() {
       })
     }
     await refresh()
-    closeModal()
+    modal.value = false
   } finally {
     saving.value = false
   }
@@ -146,18 +127,7 @@ async function confirmDelete() {
   padding-bottom: 16px;
 }
 
-.page__header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 16px;
-  position: sticky;
-  top: 0;
-  background: var(--tg-bg);
-  z-index: 10;
-}
-
-.page__back {
+.add-btn {
   background: none;
   border: none;
   font-size: 28px;
@@ -167,39 +137,10 @@ async function confirmDelete() {
   line-height: 1;
 }
 
-.page__title {
-  flex: 1;
-  font-size: 20px;
-  font-weight: 600;
-}
-
-.page__add {
-  background: none;
-  border: none;
-  font-size: 28px;
-  color: var(--tg-button);
-  cursor: pointer;
-  padding: 0 4px;
-  line-height: 1;
-}
-
-.page__loader {
+.loader {
   display: flex;
   justify-content: center;
   padding: 40px;
-}
-
-.spinner {
-  width: 32px;
-  height: 32px;
-  border: 3px solid color-mix(in srgb, var(--tg-button) 20%, transparent);
-  border-top-color: var(--tg-button);
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
 }
 
 .list {
@@ -257,43 +198,13 @@ async function confirmDelete() {
   color: #ff3b30;
 }
 
-/* Modal */
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: color-mix(in srgb, #000 40%, transparent);
-  display: flex;
-  align-items: flex-end;
-  z-index: 200;
-  padding: 16px;
-  padding-bottom: calc(16px + env(safe-area-inset-bottom));
-}
-
-.modal {
-  background: var(--tg-bg);
-  border-radius: 20px;
-  padding: 24px;
-  width: 100%;
-}
-
-.modal__title {
+.sheet-title {
   font-size: 18px;
   font-weight: 600;
   margin-bottom: 20px;
 }
 
-.modal__field {
-  margin-bottom: 16px;
-}
-
-.modal__label {
-  display: block;
-  font-size: 13px;
-  color: var(--tg-hint);
-  margin-bottom: 6px;
-}
-
-.modal__input {
+.input {
   width: 100%;
   padding: 12px 14px;
   border-radius: 12px;
@@ -304,20 +215,20 @@ async function confirmDelete() {
   outline: none;
 }
 
-.modal__preview {
+.icon-preview {
   width: 40px;
   height: 40px;
   object-fit: contain;
   margin-top: 8px;
 }
 
-.modal__actions {
+.sheet-actions {
   display: flex;
   gap: 8px;
   margin-top: 8px;
 }
 
-.modal__btn {
+.btn {
   flex: 1;
   padding: 13px;
   border-radius: 12px;
@@ -327,49 +238,17 @@ async function confirmDelete() {
   cursor: pointer;
 }
 
-.modal__btn--cancel {
+.btn:disabled {
+  opacity: 0.6;
+}
+
+.btn--cancel {
   background: var(--tg-secondary-bg);
   color: var(--tg-text);
 }
 
-.modal__btn--save {
+.btn--save {
   background: var(--tg-button);
   color: var(--tg-button-text);
-}
-
-.modal__btn--save:disabled,
-.modal__btn--delete:disabled {
-  opacity: 0.6;
-}
-
-.modal__btn--delete {
-  background: #ff3b30;
-  color: #fff;
-}
-
-.modal__text {
-  font-size: 14px;
-  color: var(--tg-hint);
-  margin-bottom: 20px;
-}
-
-.modal-enter-active,
-.modal-leave-active {
-  transition: opacity 0.2s ease;
-}
-
-.modal-enter-active .modal,
-.modal-leave-active .modal {
-  transition: transform 0.2s ease;
-}
-
-.modal-enter-from,
-.modal-leave-to {
-  opacity: 0;
-}
-
-.modal-enter-from .modal,
-.modal-leave-to .modal {
-  transform: translateY(100%);
 }
 </style>
