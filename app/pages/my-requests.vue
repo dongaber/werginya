@@ -52,13 +52,12 @@ const filters = [
   { value: 'CANCELLED', label: 'Отменена' },
 ]
 
-const { telegram } = useNuxtApp()
-const tg = telegram as any
-const telegramId = tg?.initDataUnsafe?.user?.id ?? tg?.user?.id ?? 1
+const { telegramId } = useTelegram()
+const { error: showError, success: showSuccess } = useToast()
 
 const { data, pending, refresh } = await useFetch('/api/requests', {
   query: computed(() => ({
-    telegramId,
+    telegramId: telegramId.value,
     ...(activeFilter.value !== 'ALL' ? { status: activeFilter.value } : {}),
   })),
 })
@@ -71,6 +70,9 @@ async function handleAction(id: number, status: string) {
   try {
     await $fetch(`/api/requests/${id}`, { method: 'PATCH', body: { status } })
     await refresh()
+    showSuccess('Статус заявки обновлён')
+  } catch {
+    showError('Не удалось обновить статус. Попробуйте ещё раз.')
   } finally {
     actionLoading.value = null
   }

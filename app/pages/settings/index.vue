@@ -32,21 +32,11 @@
 </template>
 
 <script setup lang="ts">
-const { telegram } = useNuxtApp()
-const tg = telegram as any
-const tgUser = tg?.initDataUnsafe?.user ?? tg?.user
-
-const firstName = tgUser?.first_name ?? 'Пользователь'
-const lastName = tgUser?.last_name ?? ''
-const username = tgUser?.username ?? ''
-const fullName = [firstName, lastName].filter(Boolean).join(' ')
-const avatarLetter = firstName[0]?.toUpperCase() ?? '?'
-
-const telegramId = tgUser?.id ?? 1
+const { telegramId, fullName, username, avatarLetter } = useTelegram()
 
 const { data: meData } = await useFetch<{ isAdmin: boolean; subscriptionActive: boolean }>(
   '/api/me',
-  { query: { telegramId } }
+  { query: { telegramId: telegramId.value } }
 )
 
 const subActive = computed(() => meData.value?.subscriptionActive ?? false)

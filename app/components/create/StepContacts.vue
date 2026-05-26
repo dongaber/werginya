@@ -28,16 +28,13 @@
 <script setup lang="ts">
 const props = defineProps<{ form: Record<string, any> }>()
 
-const { telegram } = useNuxtApp()
-const tg = telegram as any
-const tgUser = tg?.initDataUnsafe?.user ?? tg?.user
-
-const phone = tgUser?.phone_number ?? null
-const telegramUsername = tgUser?.username ? `@${tgUser.username}` : null
+const { tgUser, username } = useTelegram()
+const phone = computed(() => (tgUser.value as any)?.phone_number ?? null)
+const telegramUsername = computed(() => username.value ? `@${username.value}` : null)
 
 watchEffect(() => {
-  if (phone && !props.form.contactPhone) props.form.contactPhone = phone
-  if (telegramUsername && !props.form.contactTelegram) props.form.contactTelegram = telegramUsername
+  if (phone.value && !props.form.contactPhone) props.form.contactPhone = phone.value
+  if (telegramUsername.value && !props.form.contactTelegram) props.form.contactTelegram = telegramUsername.value
 })
 </script>
 

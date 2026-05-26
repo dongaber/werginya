@@ -4,7 +4,16 @@ export function useTelegram() {
   const { $telegram } = useNuxtApp()
   const tg = $telegram as typeof WebApp
 
-  const user = computed(() => tg.initDataUnsafe?.user)
+  const tgUser = computed(() => (tg as any).initDataUnsafe?.user ?? (tg as any).user ?? null)
+  const initData = computed(() => (tg as any).initData ?? '')
+
+  const telegramId = computed<number>(() => tgUser.value?.id ?? 1)
+  const firstName = computed<string>(() => tgUser.value?.first_name ?? 'Пользователь')
+  const lastName = computed<string>(() => tgUser.value?.last_name ?? '')
+  const username = computed<string>(() => tgUser.value?.username ?? '')
+  const fullName = computed(() => [firstName.value, lastName.value].filter(Boolean).join(' '))
+  const avatarLetter = computed(() => firstName.value[0]?.toUpperCase() ?? '?')
+
   const colorScheme = computed(() => tg.colorScheme)
   const themeParams = computed(() => tg.themeParams)
 
@@ -36,7 +45,14 @@ export function useTelegram() {
 
   return {
     tg,
-    user,
+    tgUser,
+    initData,
+    telegramId,
+    firstName,
+    lastName,
+    username,
+    fullName,
+    avatarLetter,
     colorScheme,
     themeParams,
     showMainButton,

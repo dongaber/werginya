@@ -130,15 +130,14 @@ async function nextStep() {
   step.value++
 }
 
+const { telegramId } = useTelegram()
+const { error: showError } = useToast()
+
 async function submit() {
   submitting.value = true
   try {
-    const { telegram } = useNuxtApp()
-    const tg = telegram as any
-    const telegramId = tg?.initDataUnsafe?.user?.id ?? tg?.user?.id ?? 1
-
     const body: Record<string, any> = {
-      telegramId,
+      telegramId: telegramId.value,
       type: form.type,
       paymentType: form.paymentType,
       contactPhone: contactsForm.contactPhone || undefined,
@@ -173,6 +172,8 @@ async function submit() {
 
     await $fetch('/api/requests', { method: 'POST', body })
     router.push('/my-requests')
+  } catch {
+    showError('Не удалось создать заявку. Попробуйте ещё раз.')
   } finally {
     submitting.value = false
   }
