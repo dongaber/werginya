@@ -43,7 +43,7 @@
 
     <!-- Date/time -->
     <AppFormField label="Когда">
-      <input v-model="form.startsAt" class="input" type="datetime-local" />
+      <AppDatePicker v-model="form.startsAt" />
     </AppFormField>
 
     <!-- Duration (rental) -->
