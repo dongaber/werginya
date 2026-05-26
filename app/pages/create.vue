@@ -86,7 +86,7 @@ const isLast = computed(() => step.value === totalSteps - 1)
 const canProceed = computed(() => {
   if (step.value === 0) return !!form.type
   if (step.value === 1) return isDetailsValid()
-  if (step.value === 2) return true
+  if (step.value === 2) return !!contactsForm.contactPhone
   if (step.value === 3) return !!form.paymentType
   return true
 })
