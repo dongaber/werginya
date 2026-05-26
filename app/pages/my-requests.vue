@@ -48,7 +48,6 @@ const filters = [
   { value: 'ALL', label: 'Все' },
   { value: 'PENDING', label: 'Черновик' },
   { value: 'PUBLISHED', label: 'Опубликована' },
-  { value: 'IN_PROGRESS', label: 'В работе' },
   { value: 'DONE', label: 'Выполнена' },
   { value: 'CANCELLED', label: 'Отменена' },
 ]

@@ -103,10 +103,15 @@ const hasContacts = computed(
 
 const ownerActions = computed(() => {
   const s = props.request.status
-  const actions = []
-  if (s === 'PENDING') actions.push({ label: 'Опубликовать', status: 'PUBLISHED', variant: 'primary' })
-  if (s === 'PENDING' || s === 'PUBLISHED') actions.push({ label: 'Отменить', status: 'CANCELLED', variant: 'danger' })
-  return actions
+  if (s === 'PENDING') return [
+    { label: 'Опубликовать', status: 'PUBLISHED', variant: 'primary' },
+    { label: 'Отменить', status: 'CANCELLED', variant: 'danger' },
+  ]
+  if (s === 'PUBLISHED') return [
+    { label: 'Выполнена', status: 'DONE', variant: 'success' },
+    { label: 'Отменить', status: 'CANCELLED', variant: 'danger' },
+  ]
+  return []
 })
 
 const typeLabels: Record<string, string> = {
@@ -350,6 +355,11 @@ const formattedDate = computed(() => {
 .card__action-btn--primary {
   background: var(--tg-button);
   color: var(--tg-button-text);
+}
+
+.card__action-btn--success {
+  background: color-mix(in srgb, #22c55e 15%, var(--tg-secondary-bg));
+  color: #22c55e;
 }
 
 .card__action-btn--danger {
