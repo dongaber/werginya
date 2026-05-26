@@ -64,6 +64,21 @@
           <span class="review-item__value">{{ form.volume || '—' }}</span>
         </div>
       </template>
+
+      <template v-if="contactsForm.contactPhone || contactsForm.contactTelegram || contactsForm.contactWhatsapp">
+        <div v-if="contactsForm.contactPhone" class="review-item">
+          <span class="review-item__label">Телефон</span>
+          <span class="review-item__value">{{ contactsForm.contactPhone }}</span>
+        </div>
+        <div v-if="contactsForm.contactTelegram" class="review-item">
+          <span class="review-item__label">Telegram</span>
+          <span class="review-item__value">{{ contactsForm.contactTelegram }}</span>
+        </div>
+        <div v-if="contactsForm.contactWhatsapp" class="review-item">
+          <span class="review-item__label">WhatsApp</span>
+          <span class="review-item__value">{{ contactsForm.contactWhatsapp }}</span>
+        </div>
+      </template>
     </div>
   </div>
 </template>
@@ -73,6 +88,7 @@ const props = defineProps<{
   type: string
   paymentType: string | null
   form: Record<string, any>
+  contactsForm: Record<string, any>
   equipmentTypes: { id: number; name: string; icon: string }[] | null
 }>()
 

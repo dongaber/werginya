@@ -16,12 +16,14 @@
         <div :key="step" class="step-content">
           <CreateStepType v-if="step === 0" v-model="form.type" />
           <CreateStepDetails v-else-if="step === 1" :type="form.type!" :form="detailsForm" />
-          <CreateStepPayment v-else-if="step === 2" v-model="form.paymentType" />
+          <CreateStepContacts v-else-if="step === 2" :form="contactsForm" />
+          <CreateStepPayment v-else-if="step === 3" v-model="form.paymentType" />
           <CreateStepReview
-            v-else-if="step === 3"
+            v-else-if="step === 4"
             :type="form.type!"
             :payment-type="form.paymentType"
             :form="detailsForm"
+            :contacts-form="contactsForm"
             :equipment-types="equipmentTypes ?? null"
           />
         </div>
@@ -32,7 +34,7 @@
     <div class="action">
       <button class="action__btn" :disabled="!canProceed || submitting" @click="nextStep">
         <span v-if="submitting" class="action__spinner"><AppSpinner :size="20" /></span>
-        <span v-else>{{ isLast ? 'Отправить' : 'Далее' }}</span>
+        <span v-else>{{ isLast ? 'Создать' : 'Далее' }}</span>
       </button>
     </div>
   </div>
@@ -45,7 +47,7 @@ const { data: equipmentTypes } = await useFetch<{ id: number; name: string; icon
   '/api/equipment-types'
 )
 
-const totalSteps = 4
+const totalSteps = 5
 const step = ref(0)
 const transitionName = ref('step-forward')
 const submitting = ref(false)
@@ -70,7 +72,13 @@ const detailsForm = reactive<Record<string, any>>({
   volume: '',
 })
 
-const stepTitles = ['Тип заявки', 'Детали', 'Оплата', 'Проверка']
+const contactsForm = reactive<Record<string, any>>({
+  contactPhone: '',
+  contactTelegram: '',
+  contactWhatsapp: '',
+})
+
+const stepTitles = ['Тип заявки', 'Детали', 'Контакты', 'Оплата', 'Проверка']
 const stepTitle = computed(() => stepTitles[step.value] ?? '')
 const progressPct = computed(() => ((step.value + 1) / totalSteps) * 100)
 const isLast = computed(() => step.value === totalSteps - 1)
@@ -78,7 +86,8 @@ const isLast = computed(() => step.value === totalSteps - 1)
 const canProceed = computed(() => {
   if (step.value === 0) return !!form.type
   if (step.value === 1) return isDetailsValid()
-  if (step.value === 2) return !!form.paymentType
+  if (step.value === 2) return true
+  if (step.value === 3) return !!form.paymentType
   return true
 })
 
@@ -132,6 +141,9 @@ async function submit() {
       telegramId,
       type: form.type,
       paymentType: form.paymentType,
+      contactPhone: contactsForm.contactPhone || undefined,
+      contactTelegram: contactsForm.contactTelegram || undefined,
+      contactWhatsapp: contactsForm.contactWhatsapp || undefined,
     }
 
     if (form.type === 'RENTAL') {
@@ -160,7 +172,7 @@ async function submit() {
     }
 
     await $fetch('/api/requests', { method: 'POST', body })
-    router.push('/')
+    router.push('/my-requests')
   } finally {
     submitting.value = false
   }
