@@ -19,25 +19,33 @@
       </button>
     </div>
 
-    <div v-if="pending" class="loader">
+    <div v-if="firstLoad" class="loader">
       <AppSpinner :size="32" />
     </div>
 
-    <div v-else-if="!filtered.length" class="empty">
-      <p class="empty__text">У вас нет заявок</p>
-      <NuxtLink to="/create" class="empty__btn">Создать заявку</NuxtLink>
-    </div>
+    <template v-else>
+      <div v-if="!items.length" class="empty">
+        <p class="empty__text">У вас нет заявок</p>
+        <NuxtLink to="/create" class="empty__btn">Создать заявку</NuxtLink>
+      </div>
 
-    <div v-else class="list">
-      <AppRequestCard
-        v-for="req in filtered"
-        :key="req.id"
-        :request="req"
-        :is-owner="true"
-        :action-loading="actionLoading === req.id"
-        @action="handleAction"
-      />
-    </div>
+      <div v-else class="list">
+        <AppRequestCard
+          v-for="req in items"
+          :key="req.id"
+          :request="req"
+          :is-owner="true"
+          :action-loading="actionLoading === req.id"
+          @action="handleAction"
+        />
+
+        <div ref="sentinel" class="sentinel" />
+
+        <div v-if="loading" class="loader-more">
+          <AppSpinner :size="24" />
+        </div>
+      </div>
+    </template>
   </div>
 </template>
 
@@ -55,21 +63,20 @@ const filters = [
 const { telegramId } = useTelegram()
 const { error: showError, success: showSuccess } = useToast()
 
-const { data, pending, refresh } = await useFetch('/api/requests', {
-  query: computed(() => ({
-    telegramId: telegramId.value,
-    ...(activeFilter.value !== 'ALL' ? { status: activeFilter.value } : {}),
-  })),
-})
+const query = computed(() => ({
+  telegramId: telegramId.value,
+  ...(activeFilter.value !== 'ALL' ? { status: activeFilter.value } : {}),
+}))
 
-const filtered = computed(() => (data.value as any[]) ?? [])
+const { items, firstLoad, loading, sentinel, reset } = useInfiniteRequests(query)
+
 const actionLoading = ref<number | null>(null)
 
 async function handleAction(id: number, status: string) {
   actionLoading.value = id
   try {
     await $fetch(`/api/requests/${id}`, { method: 'PATCH', body: { status } })
-    await refresh()
+    await reset()
     showSuccess('Статус заявки обновлён')
   } catch {
     showError('Не удалось обновить статус. Попробуйте ещё раз.')
@@ -78,7 +85,7 @@ async function handleAction(id: number, status: string) {
   }
 }
 
-const { pullY, progress, refreshing } = usePullToRefresh(refresh)
+const { pullY, progress, refreshing } = usePullToRefresh(reset)
 </script>
 
 <style scoped>
@@ -161,5 +168,15 @@ const { pullY, progress, refreshing } = usePullToRefresh(refresh)
   flex-direction: column;
   gap: 10px;
   padding: 0 16px;
+}
+
+.sentinel {
+  height: 1px;
+}
+
+.loader-more {
+  display: flex;
+  justify-content: center;
+  padding: 12px 0;
 }
 </style>

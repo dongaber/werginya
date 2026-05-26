@@ -6,28 +6,33 @@
       <h1 class="page__title">Заявки</h1>
     </div>
 
-    <div v-if="pending" class="loader">
+    <div v-if="firstLoad" class="loader">
       <AppSpinner :size="32" />
     </div>
 
-    <div v-else-if="!filtered.length" class="empty">
-      <p class="empty__text">Заявок нет</p>
-    </div>
+    <template v-else>
+      <div v-if="!items.length" class="empty">
+        <p class="empty__text">Заявок нет</p>
+      </div>
 
-    <div v-else class="list">
-      <AppRequestCard v-for="req in filtered" :key="req.id" :request="req" hide-status />
-    </div>
+      <div v-else class="list">
+        <AppRequestCard v-for="req in items" :key="req.id" :request="req" hide-status />
+
+        <div ref="sentinel" class="sentinel" />
+
+        <div v-if="loading" class="loader-more">
+          <AppSpinner :size="24" />
+        </div>
+      </div>
+    </template>
   </div>
 </template>
 
 <script setup lang="ts">
-const { data, pending, refresh } = await useFetch('/api/requests', {
-  query: { status: 'PUBLISHED' },
-})
+const query = computed(() => ({ status: 'PUBLISHED' }))
+const { items, firstLoad, loading, sentinel, reset } = useInfiniteRequests(query)
 
-const filtered = computed(() => (data.value as any[]) ?? [])
-
-const { pullY, progress, refreshing } = usePullToRefresh(refresh)
+const { pullY, progress, refreshing } = usePullToRefresh(reset)
 </script>
 
 <style scoped>
@@ -43,7 +48,6 @@ const { pullY, progress, refreshing } = usePullToRefresh(refresh)
   font-size: 22px;
   font-weight: 700;
 }
-
 
 .loader {
   display: flex;
@@ -67,5 +71,15 @@ const { pullY, progress, refreshing } = usePullToRefresh(refresh)
   flex-direction: column;
   gap: 10px;
   padding: 0 16px;
+}
+
+.sentinel {
+  height: 1px;
+}
+
+.loader-more {
+  display: flex;
+  justify-content: center;
+  padding: 12px 0;
 }
 </style>
