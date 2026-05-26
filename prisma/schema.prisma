@@ -86,6 +86,22 @@ model Delivery {
   volume    String
 }
 
+model HelpFaq {
+  id       Int    @id @default(autoincrement())
+  question String
+  answer   String
+  order    Int    @default(0)
+}
+
+model HelpContact {
+  id    Int    @id @default(autoincrement())
+  label String
+  type  String
+  value String
+  url   String
+  order Int    @default(0)
+}
+
 enum RequestType {
   RENTAL
   TRANSPORTATION
