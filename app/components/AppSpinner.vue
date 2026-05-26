@@ -1,9 +1,12 @@
 <template>
-  <div class="spinner" :style="{ width: size + 'px', height: size + 'px' }" />
+  <div
+    class="spinner"
+    :style="{ width: size + 'px', height: size + 'px', animationPlayState: spinning ? 'running' : 'paused' }"
+  />
 </template>
 
 <script setup lang="ts">
-defineProps<{ size?: number }>()
+withDefaults(defineProps<{ size?: number; spinning?: boolean }>(), { spinning: true })
 </script>
 
 <style scoped>
