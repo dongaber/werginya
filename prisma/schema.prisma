@@ -1,0 +1,36 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id         Int       @id @default(autoincrement())
+  telegramId BigInt    @unique
+  username   String?
+  firstName  String
+  lastName   String?
+  createdAt  DateTime  @default(now())
+  requests   Request[]
+}
+
+model Request {
+  id          Int           @id @default(autoincrement())
+  title       String
+  description String?
+  status      RequestStatus @default(PENDING)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  userId      Int
+  user        User          @relation(fields: [userId], references: [id])
+}
+
+enum RequestStatus {
+  PENDING
+  IN_PROGRESS
+  DONE
+  CANCELLED
+}
