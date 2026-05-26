@@ -29,7 +29,7 @@
       </div>
     </div>
 
-    <!-- Modal -->
+    <!-- Form modal -->
     <Transition name="modal">
       <div v-if="modal" class="modal-backdrop" @click.self="closeModal">
         <div class="modal">
@@ -52,6 +52,22 @@
         </div>
       </div>
     </Transition>
+
+    <!-- Confirm delete modal -->
+    <Transition name="modal">
+      <div v-if="confirmId !== null" class="modal-backdrop" @click.self="confirmId = null">
+        <div class="modal">
+          <h2 class="modal__title">Удалить вид техники?</h2>
+          <p class="modal__text">Это действие нельзя отменить.</p>
+          <div class="modal__actions">
+            <button class="modal__btn modal__btn--cancel" @click="confirmId = null">Отмена</button>
+            <button class="modal__btn modal__btn--delete" :disabled="saving" @click="confirmDelete">
+              {{ saving ? '...' : 'Удалить' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </Transition>
   </div>
 </template>
 
@@ -66,6 +82,7 @@ const modal = ref(false)
 const editing = ref<number | null>(null)
 const saving = ref(false)
 const form = reactive({ name: '', icon: '' })
+const confirmId = ref<number | null>(null)
 
 function openCreate() {
   editing.value = null
@@ -107,13 +124,20 @@ async function save() {
   }
 }
 
-async function remove(id: number) {
-  const { $telegram } = useNuxtApp()
-  ;($telegram as any).showConfirm('Удалить вид техники?', async (ok: boolean) => {
-    if (!ok) return
-    await $fetch(`/api/equipment-types/${id}`, { method: 'DELETE' })
+function remove(id: number) {
+  confirmId.value = id
+}
+
+async function confirmDelete() {
+  if (confirmId.value === null) return
+  saving.value = true
+  try {
+    await $fetch(`/api/equipment-types/${confirmId.value}`, { method: 'DELETE' })
     await refresh()
-  })
+    confirmId.value = null
+  } finally {
+    saving.value = false
+  }
 }
 </script>
 
@@ -313,8 +337,20 @@ async function remove(id: number) {
   color: var(--tg-button-text);
 }
 
-.modal__btn--save:disabled {
+.modal__btn--save:disabled,
+.modal__btn--delete:disabled {
   opacity: 0.6;
+}
+
+.modal__btn--delete {
+  background: #ff3b30;
+  color: #fff;
+}
+
+.modal__text {
+  font-size: 14px;
+  color: var(--tg-hint);
+  margin-bottom: 20px;
 }
 
 .modal-enter-active,
