@@ -16,6 +16,13 @@
 <script setup lang="ts">
 const items = [
   {
+    to: '/settings/subscription',
+    label: 'Подписка',
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
+      <path fill="currentColor" d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11zm14 3a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-1h14z"/>
+    </svg>`,
+  },
+  {
     to: '/settings/equipment-types',
     label: 'Виды техники',
     icon: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">

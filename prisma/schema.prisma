@@ -8,13 +8,14 @@ datasource db {
 }
 
 model User {
-  id         Int       @id @default(autoincrement())
-  telegramId BigInt    @unique
-  username   String?
-  firstName  String
-  lastName   String?
-  createdAt  DateTime  @default(now())
-  requests   Request[]
+  id                    Int       @id @default(autoincrement())
+  telegramId            BigInt    @unique
+  username              String?
+  firstName             String
+  lastName              String?
+  createdAt             DateTime  @default(now())
+  subscriptionExpiresAt DateTime?
+  requests              Request[]
 }
 
 model EquipmentType {
@@ -26,17 +27,20 @@ model EquipmentType {
 }
 
 model Request {
-  id             Int             @id @default(autoincrement())
-  type           RequestType
-  paymentType    PaymentType
-  status         RequestStatus   @default(PENDING)
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-  userId         Int
-  user           User            @relation(fields: [userId], references: [id])
-  rental         Rental?
-  transportation Transportation?
-  delivery       Delivery?
+  id               Int             @id @default(autoincrement())
+  type             RequestType
+  paymentType      PaymentType
+  status           RequestStatus   @default(PENDING)
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  userId           Int
+  user             User            @relation(fields: [userId], references: [id])
+  rental           Rental?
+  transportation   Transportation?
+  delivery         Delivery?
+  contactPhone     String?
+  contactTelegram  String?
+  contactWhatsapp  String?
 }
 
 model Rental {
@@ -94,6 +98,7 @@ enum PaymentType {
 
 enum RequestStatus {
   PENDING
+  PUBLISHED
   IN_PROGRESS
   DONE
   CANCELLED
