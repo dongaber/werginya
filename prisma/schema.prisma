@@ -20,6 +20,7 @@ model User {
 model EquipmentType {
   id      Int       @id @default(autoincrement())
   name    String    @unique
+  icon    String
   rentals Rental[]
 }
 
