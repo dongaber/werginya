@@ -4,9 +4,7 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   modules: ['@nuxt/eslint'],
   eslint: {
-    config: {
-      prettier: true,
-    },
+    config: {},
   },
   app: {
     head: {
