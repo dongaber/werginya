@@ -1,11 +1,16 @@
 import { createHmac } from 'node:crypto'
 
-export function verifyInitData(initData: string, botToken: string): boolean {
-  if (!initData) return false
+const MAX_AGE_SECONDS = 86400 // 24h
+
+export function verifyInitData(initData: string, botToken: string): string | null {
+  if (!initData) return null
 
   const params = new URLSearchParams(initData)
   const hash = params.get('hash')
-  if (!hash) return false
+  if (!hash) return null
+
+  const authDate = Number(params.get('auth_date'))
+  if (!authDate || Date.now() / 1000 - authDate > MAX_AGE_SECONDS) return null
 
   params.delete('hash')
 
@@ -17,5 +22,12 @@ export function verifyInitData(initData: string, botToken: string): boolean {
   const secretKey = createHmac('sha256', 'WebAppData').update(botToken).digest()
   const expectedHash = createHmac('sha256', secretKey).update(dataCheckString).digest('hex')
 
-  return expectedHash === hash
+  if (expectedHash !== hash) return null
+
+  try {
+    const user = JSON.parse(params.get('user') ?? '{}')
+    return user.id ? String(user.id) : null
+  } catch {
+    return null
+  }
 }
