@@ -29,7 +29,17 @@
 </template>
 
 <script setup lang="ts">
-const query = computed(() => ({}))
+const { filters, load } = useUserFilters()
+
+if (import.meta.client) {
+  load()
+}
+
+const query = computed(() => ({
+  ...(filters.value?.geoCity ? { geoCity: filters.value.geoCity } : {}),
+  ...(filters.value?.equipmentTypeIds?.length ? { equipmentTypeIds: filters.value.equipmentTypeIds } : {}),
+}))
+
 const { items, firstLoad, loading, sentinel, reset } = useInfiniteRequests(query)
 
 const { pullY, progress, refreshing } = usePullToRefresh(reset)
