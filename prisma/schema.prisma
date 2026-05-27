@@ -19,6 +19,7 @@ model User {
   filterGeoCity         String?
   filterEquipIds        Int[]     @default([])
   requests              Request[]
+  contactViews          ContactView[]
 }
 
 model EquipmentType {
@@ -44,6 +45,7 @@ model Request {
   contactPhone     String?
   contactTelegram  String?
   contactWhatsapp  String?
+  contactViews     ContactView[]
 }
 
 model Rental {
@@ -86,6 +88,17 @@ model Delivery {
   toLng     Decimal? @db.Decimal(10, 7)
   startsAt  DateTime
   volume    String
+}
+
+model ContactView {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  requestId Int
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  request   Request  @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, requestId])
 }
 
 model HelpFaq {
