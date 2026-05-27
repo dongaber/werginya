@@ -29,7 +29,7 @@
 </template>
 
 <script setup lang="ts">
-const query = computed(() => ({ status: 'PUBLISHED' }))
+const query = computed(() => ({}))
 const { items, firstLoad, loading, sentinel, reset } = useInfiniteRequests(query)
 
 const { pullY, progress, refreshing } = usePullToRefresh(reset)

@@ -10,6 +10,9 @@ export default defineEventHandler(async (event) => {
     resolvedUserId = Number(userId)
   }
 
+  const isPublicFeed = !resolvedUserId
+  const resolvedStatus = isPublicFeed ? 'PUBLISHED' : (status ? String(status) : undefined)
+
   const takeNum = take ? Math.min(Number(take), 50) : 20
   const cursorId = cursor ? Number(cursor) : undefined
 
@@ -17,7 +20,7 @@ export default defineEventHandler(async (event) => {
     take: takeNum,
     ...(cursorId ? { skip: 1, cursor: { id: cursorId } } : {}),
     where: {
-      ...(status && { status: String(status) as any }),
+      ...(resolvedStatus && { status: resolvedStatus as any }),
       ...(type && { type: String(type) as any }),
       ...(resolvedUserId && { userId: resolvedUserId }),
     },
