@@ -24,7 +24,10 @@
     </div>
 
     <div class="card__footer">
-      <span class="card__date">{{ formattedDate }}</span>
+      <div class="card__dates">
+        <span class="card__date">{{ formattedDate }}</span>
+        <span class="card__created">Создана {{ formattedCreatedAt }}</span>
+      </div>
       <span class="card__payment">{{ paymentLabel }}</span>
     </div>
 
@@ -167,6 +170,15 @@ const formattedDate = computed(() => {
     minute: '2-digit',
   })
 })
+
+const formattedCreatedAt = computed(() =>
+  new Date(props.request.createdAt).toLocaleString('ru-RU', {
+    day: 'numeric',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+)
 </script>
 
 <style scoped>
@@ -263,9 +275,20 @@ const formattedDate = computed(() => {
   border-top: 1px solid color-mix(in srgb, var(--tg-hint) 12%, transparent);
 }
 
+.card__dates {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
 .card__date {
   font-size: 12px;
   color: var(--tg-hint);
+}
+
+.card__created {
+  font-size: 11px;
+  color: color-mix(in srgb, var(--tg-hint) 60%, transparent);
 }
 
 .card__payment {
