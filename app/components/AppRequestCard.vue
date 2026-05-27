@@ -76,12 +76,12 @@
           <span v-else>Показать контакты (осталось {{ viewsRemaining }})</span>
         </button>
 
-        <div v-else class="card__contacts-locked">
+        <button class="card__contacts-locked" @click="$emit('subscribe')">
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24">
             <path fill="currentColor" d="M12 1C8.676 1 6 3.676 6 7v1H4v15h16V8h-2V7c0-3.324-2.676-6-6-6zm0 2c2.276 0 4 1.724 4 4v1H8V7c0-2.276 1.724-4 4-4zm0 9a2 2 0 1 1 0 4 2 2 0 0 1 0-4z"/>
           </svg>
           Нужна подписка
-        </div>
+        </button>
       </template>
     </div>
 
@@ -128,7 +128,7 @@ const props = defineProps<{
   subscriptionActive?: boolean
 }>()
 
-defineEmits<{ action: [id: number, status: string]; 'view-contacts': [id: number] }>()
+defineEmits<{ action: [id: number, status: string]; 'view-contacts': [id: number]; subscribe: [] }>()
 
 const showContacts = ref(false)
 
@@ -364,6 +364,11 @@ const formattedCreatedAt = computed(() =>
   gap: 6px;
   font-size: 13px;
   color: var(--tg-hint);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .card__contacts {

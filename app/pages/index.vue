@@ -26,6 +26,7 @@
           :views-remaining="viewsRemaining"
           :subscription-active="me?.subscriptionActive"
           @view-contacts="handleViewContacts"
+          @subscribe="showSubscriptionModal = true"
         />
 
         <div ref="sentinel" class="sentinel" />
@@ -35,6 +36,8 @@
         </div>
       </div>
     </template>
+
+    <AppSubscriptionModal v-model="showSubscriptionModal" />
   </div>
 </template>
 
@@ -42,6 +45,7 @@
 const { filters, load: loadFilters } = useUserFilters()
 const { me, load: loadMe, canViewContacts, viewsRemaining, incrementViewCount } = useMe()
 const { error: showError } = useToast()
+const showSubscriptionModal = ref(false)
 
 if (import.meta.client) {
   loadFilters()
@@ -66,7 +70,7 @@ async function handleViewContacts(id: number) {
     incrementViewCount()
   } catch (err: any) {
     if (err?.data?.reason === 'limit_reached') {
-      showError('Лимит просмотров исчерпан. Оформите подписку.')
+      showSubscriptionModal.value = true
     } else {
       showError('Не удалось открыть контакты')
     }
