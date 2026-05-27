@@ -4,13 +4,19 @@ export default defineEventHandler(async (event) => {
 
   const user = await prisma.user.findUnique({
     where: { telegramId: BigInt(telegramId) },
-    select: { id: true, isAdmin: true, subscriptionExpiresAt: true },
+    select: {
+      id: true,
+      isAdmin: true,
+      subscriptionExpiresAt: true,
+      _count: { select: { contactViews: true } },
+    },
   })
 
-  if (!user) return serialize({ isAdmin: false, subscriptionActive: false })
+  if (!user) return serialize({ isAdmin: false, subscriptionActive: false, contactViewCount: 0 })
 
   return serialize({
     isAdmin: user.isAdmin,
     subscriptionActive: !!user.subscriptionExpiresAt && user.subscriptionExpiresAt > new Date(),
+    contactViewCount: user._count.contactViews,
   })
 })

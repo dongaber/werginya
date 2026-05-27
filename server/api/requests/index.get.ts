@@ -56,5 +56,35 @@ export default defineEventHandler(async (event) => {
     orderBy: { createdAt: 'desc' },
   })
 
-  return serialize(data)
+  // For public feed: determine which requests the current user has already unlocked
+  let unlockedSet = new Set<number>()
+  if (isPublicFeed && data.length > 0) {
+    const telegramId = event.context.telegramId
+    if (telegramId) {
+      const currentUser = await prisma.user.findUnique({
+        where: { telegramId: BigInt(telegramId) },
+        select: { id: true },
+      })
+      if (currentUser) {
+        const views = await prisma.contactView.findMany({
+          where: { userId: currentUser.id, requestId: { in: data.map(r => r.id) } },
+          select: { requestId: true },
+        })
+        unlockedSet = new Set(views.map(v => v.requestId))
+      }
+    }
+  }
+
+  const result = data.map((req) => {
+    const unlocked = !isPublicFeed || unlockedSet.has(req.id)
+    return {
+      ...req,
+      contactPhone: unlocked ? req.contactPhone : null,
+      contactTelegram: unlocked ? req.contactTelegram : null,
+      contactWhatsapp: unlocked ? req.contactWhatsapp : null,
+      contactsUnlocked: unlocked,
+    }
+  })
+
+  return serialize(result)
 })
