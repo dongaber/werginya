@@ -32,30 +32,57 @@
     </div>
 
     <!-- Contacts section -->
-    <div v-if="hasContacts" class="card__contacts-wrap">
-      <button class="card__contacts-btn" @click="showContacts = !showContacts">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24">
-          <path fill="currentColor" d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02z"/>
-        </svg>
-        {{ showContacts ? 'Скрыть контакты' : 'Показать контакты' }}
-      </button>
+    <div class="card__contacts-wrap">
+      <!-- Unlocked: toggle show/hide -->
+      <template v-if="contactsVisible">
+        <button class="card__contacts-btn" @click="showContacts = !showContacts">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24">
+            <path fill="currentColor" d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02z"/>
+          </svg>
+          {{ showContacts ? 'Скрыть контакты' : 'Показать контакты' }}
+        </button>
 
-      <Transition name="contacts">
-        <div v-if="showContacts" class="card__contacts">
-          <a v-if="request.contactPhone" :href="`tel:${request.contactPhone}`" class="contact-row">
-            <span class="contact-row__label">Телефон</span>
-            <span class="contact-row__value">{{ request.contactPhone }}</span>
-          </a>
-          <a v-if="request.contactTelegram" :href="`https://t.me/${request.contactTelegram.replace('@', '')}`" class="contact-row" target="_blank">
-            <span class="contact-row__label">Telegram</span>
-            <span class="contact-row__value">{{ request.contactTelegram }}</span>
-          </a>
-          <a v-if="request.contactWhatsapp" :href="`https://wa.me/${request.contactWhatsapp.replace(/\D/g, '')}`" class="contact-row" target="_blank">
-            <span class="contact-row__label">WhatsApp</span>
-            <span class="contact-row__value">{{ request.contactWhatsapp }}</span>
-          </a>
+        <Transition name="contacts">
+          <div v-if="showContacts" class="card__contacts">
+            <a v-if="request.contactPhone" :href="`tel:${request.contactPhone}`" class="contact-row">
+              <span class="contact-row__label">Телефон</span>
+              <span class="contact-row__value">{{ request.contactPhone }}</span>
+            </a>
+            <a v-if="request.contactTelegram" :href="`https://t.me/${request.contactTelegram.replace('@', '')}`" class="contact-row" target="_blank">
+              <span class="contact-row__label">Telegram</span>
+              <span class="contact-row__value">{{ request.contactTelegram }}</span>
+            </a>
+            <a v-if="request.contactWhatsapp" :href="`https://wa.me/${request.contactWhatsapp.replace(/\D/g, '')}`" class="contact-row" target="_blank">
+              <span class="contact-row__label">WhatsApp</span>
+              <span class="contact-row__value">{{ request.contactWhatsapp }}</span>
+            </a>
+          </div>
+        </Transition>
+      </template>
+
+      <!-- Not unlocked: unlock button or subscription prompt -->
+      <template v-else-if="!isOwner">
+        <button
+          v-if="canViewContacts"
+          class="card__contacts-btn card__contacts-btn--unlock"
+          :disabled="viewLoading"
+          @click="$emit('view-contacts', request.id)"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24">
+            <path fill="currentColor" d="M12 1C8.676 1 6 3.676 6 7v1H4v15h16V8h-2V7c0-3.324-2.676-6-6-6zm0 2c2.276 0 4 1.724 4 4v1H8V7c0-2.276 1.724-4 4-4zm0 9a2 2 0 1 1 0 4 2 2 0 0 1 0-4z"/>
+          </svg>
+          <span v-if="viewLoading">Открываем...</span>
+          <span v-else-if="subscriptionActive">Показать контакты</span>
+          <span v-else>Показать контакты (осталось {{ viewsRemaining }})</span>
+        </button>
+
+        <div v-else class="card__contacts-locked">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24">
+            <path fill="currentColor" d="M12 1C8.676 1 6 3.676 6 7v1H4v15h16V8h-2V7c0-3.324-2.676-6-6-6zm0 2c2.276 0 4 1.724 4 4v1H8V7c0-2.276 1.724-4 4-4zm0 9a2 2 0 1 1 0 4 2 2 0 0 1 0-4z"/>
+          </svg>
+          Нужна подписка
         </div>
-      </Transition>
+      </template>
     </div>
 
     <!-- Owner actions -->
@@ -84,6 +111,7 @@ interface Request {
   contactPhone?: string | null
   contactTelegram?: string | null
   contactWhatsapp?: string | null
+  contactsUnlocked?: boolean
   rental: { address: string; startsAt: string; durationDays: number; equipmentType: { name: string } } | null
   transportation: { fromAddress: string; toAddress: string; startsAt: string; cargo: string; equipmentType: { name: string } } | null
   delivery: { toAddress: string; startsAt: string; cargo: string; volume: string } | null
@@ -94,14 +122,18 @@ const props = defineProps<{
   isOwner?: boolean
   hideStatus?: boolean
   actionLoading?: boolean
+  viewLoading?: boolean
+  canViewContacts?: boolean
+  viewsRemaining?: number
+  subscriptionActive?: boolean
 }>()
 
-defineEmits<{ action: [id: number, status: string] }>()
+defineEmits<{ action: [id: number, status: string]; 'view-contacts': [id: number] }>()
 
 const showContacts = ref(false)
 
-const hasContacts = computed(
-  () => !!(props.request.contactPhone || props.request.contactTelegram || props.request.contactWhatsapp)
+const contactsVisible = computed(
+  () => props.isOwner || !!props.request.contactsUnlocked
 )
 
 const ownerActions = computed(() => {
@@ -300,6 +332,7 @@ const formattedCreatedAt = computed(() =>
 .card__contacts-wrap {
   border-top: 1px solid color-mix(in srgb, var(--tg-hint) 12%, transparent);
   padding-top: 8px;
+  min-height: 28px;
 }
 
 .card__contacts-btn {
@@ -314,6 +347,23 @@ const formattedCreatedAt = computed(() =>
   cursor: pointer;
   padding: 0;
   -webkit-tap-highlight-color: transparent;
+}
+
+.card__contacts-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.card__contacts-btn--unlock {
+  color: var(--tg-button);
+}
+
+.card__contacts-locked {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--tg-hint);
 }
 
 .card__contacts {

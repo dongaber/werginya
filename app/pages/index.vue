@@ -16,7 +16,17 @@
       </div>
 
       <div v-else class="list">
-        <AppRequestCard v-for="req in items" :key="req.id" :request="req" hide-status />
+        <AppRequestCard
+          v-for="req in items"
+          :key="req.id"
+          :request="req"
+          hide-status
+          :view-loading="viewLoading === req.id"
+          :can-view-contacts="canViewContacts"
+          :views-remaining="viewsRemaining"
+          :subscription-active="me?.subscriptionActive"
+          @view-contacts="handleViewContacts"
+        />
 
         <div ref="sentinel" class="sentinel" />
 
@@ -29,10 +39,13 @@
 </template>
 
 <script setup lang="ts">
-const { filters, load } = useUserFilters()
+const { filters, load: loadFilters } = useUserFilters()
+const { me, load: loadMe, canViewContacts, viewsRemaining, incrementViewCount } = useMe()
+const { error: showError } = useToast()
 
 if (import.meta.client) {
-  load()
+  loadFilters()
+  loadMe()
 }
 
 const query = computed(() => ({
@@ -40,9 +53,27 @@ const query = computed(() => ({
   ...(filters.value?.equipmentTypeIds?.length ? { equipmentTypeIds: filters.value.equipmentTypeIds } : {}),
 }))
 
-const { items, firstLoad, loading, sentinel, reset } = useInfiniteRequests(query)
-
+const { items, firstLoad, loading, sentinel, reset, updateItem } = useInfiniteRequests(query)
 const { pullY, progress, refreshing } = usePullToRefresh(reset)
+
+const viewLoading = ref<number | null>(null)
+
+async function handleViewContacts(id: number) {
+  viewLoading.value = id
+  try {
+    const contacts = await $fetch(`/api/requests/${id}/view-contacts`, { method: 'POST' })
+    updateItem(id, { ...contacts, contactsUnlocked: true })
+    incrementViewCount()
+  } catch (err: any) {
+    if (err?.data?.reason === 'limit_reached') {
+      showError('Лимит просмотров исчерпан. Оформите подписку.')
+    } else {
+      showError('Не удалось открыть контакты')
+    }
+  } finally {
+    viewLoading.value = null
+  }
+}
 </script>
 
 <style scoped>

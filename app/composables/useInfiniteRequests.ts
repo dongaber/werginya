@@ -51,7 +51,12 @@ export function useInfiniteRequests(query: ComputedRef<Record<string, any>>) {
 
   watch(query, reset, { deep: true })
 
+  function updateItem(id: number, patch: Record<string, any>) {
+    const idx = items.value.findIndex((item: any) => item.id === id)
+    if (idx !== -1) items.value[idx] = { ...items.value[idx], ...patch }
+  }
+
   onScopeDispose(() => observer?.disconnect())
 
-  return { items, hasMore, loading, firstLoad, sentinel, reset }
+  return { items, hasMore, loading, firstLoad, sentinel, reset, updateItem }
 }
