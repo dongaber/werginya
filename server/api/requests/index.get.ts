@@ -1,13 +1,13 @@
 export default defineEventHandler(async (event) => {
-  const { status, type, userId, telegramId, cursor, take, geoCity, equipmentTypeIds } = getQuery(event)
+  const { status, type, mine, cursor, take, geoCity, equipmentTypeIds } = getQuery(event)
 
   let resolvedUserId: number | undefined
-  if (telegramId) {
-    const user = await prisma.user.findUnique({ where: { telegramId: BigInt(String(telegramId)) } })
+  if (mine) {
+    const telegramId = event.context.telegramId
+    if (!telegramId) throw createError({ statusCode: 401, message: 'Unauthorized' })
+    const user = await prisma.user.findUnique({ where: { telegramId: BigInt(telegramId) } })
     if (!user) return []
     resolvedUserId = user.id
-  } else if (userId) {
-    resolvedUserId = Number(userId)
   }
 
   const isPublicFeed = !resolvedUserId

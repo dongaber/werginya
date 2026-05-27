@@ -60,11 +60,10 @@ const filters = [
   { value: 'CANCELLED', label: 'Отменена' },
 ]
 
-const { telegramId } = useTelegram()
 const { error: showError, success: showSuccess } = useToast()
 
 const query = computed(() => ({
-  telegramId: telegramId.value,
+  mine: true,
   ...(activeFilter.value !== 'ALL' ? { status: activeFilter.value } : {}),
 }))
 

@@ -10,6 +10,8 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, message: 'invalid status' })
   }
 
+  await requireOwnerOrAdmin(event, id)
+
   const data = await prisma.request.update({
     where: { id },
     data: { status: body.status },

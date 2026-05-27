@@ -4,6 +4,8 @@ export default defineEventHandler(async (event) => {
 
   if (!id) throw createError({ statusCode: 400, message: 'invalid id' })
 
+  await requireOwnerOrAdmin(event, id)
+
   const { status, paymentType, rental, transportation, delivery } = body
 
   const data = await prisma.request.update({

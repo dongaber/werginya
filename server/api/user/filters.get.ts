@@ -1,5 +1,5 @@
 export default defineEventHandler(async (event) => {
-  const telegramId = getHeader(event, 'x-telegram-id')
+  const telegramId = event.context.telegramId
   if (!telegramId) throw createError({ statusCode: 401, message: 'Unauthorized' })
 
   const user = await prisma.user.findUnique({

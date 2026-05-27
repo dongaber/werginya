@@ -3,6 +3,8 @@ export default defineEventHandler(async (event) => {
 
   if (!id) throw createError({ statusCode: 400, message: 'invalid id' })
 
+  await requireOwnerOrAdmin(event, id)
+
   await prisma.request.delete({ where: { id } })
 
   return { success: true }

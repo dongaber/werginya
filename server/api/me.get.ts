@@ -1,9 +1,9 @@
 export default defineEventHandler(async (event) => {
-  const { telegramId } = getQuery(event)
-  if (!telegramId) throw createError({ statusCode: 400, message: 'telegramId required' })
+  const telegramId = event.context.telegramId
+  if (!telegramId) throw createError({ statusCode: 401, message: 'Unauthorized' })
 
   const user = await prisma.user.findUnique({
-    where: { telegramId: BigInt(String(telegramId)) },
+    where: { telegramId: BigInt(telegramId) },
     select: { id: true, isAdmin: true, subscriptionExpiresAt: true },
   })
 
