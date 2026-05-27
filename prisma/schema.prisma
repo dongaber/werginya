@@ -16,6 +16,8 @@ model User {
   createdAt             DateTime  @default(now())
   subscriptionExpiresAt DateTime?
   isAdmin               Boolean   @default(false)
+  filterGeoCity         String?
+  filterEquipIds        Int[]     @default([])
   requests              Request[]
 }
 
