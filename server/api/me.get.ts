@@ -12,9 +12,10 @@ export default defineEventHandler(async (event) => {
     },
   })
 
-  if (!user) return serialize({ isAdmin: false, subscriptionActive: false, contactViewCount: 0 })
+  if (!user) return serialize({ exists: false, isAdmin: false, subscriptionActive: false, contactViewCount: 0 })
 
   return serialize({
+    exists: true,
     isAdmin: user.isAdmin,
     subscriptionActive: !!user.subscriptionExpiresAt && user.subscriptionExpiresAt > new Date(),
     contactViewCount: user._count.contactViews,
