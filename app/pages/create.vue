@@ -174,8 +174,8 @@ async function submit() {
 
     await $fetch('/api/requests', { method: 'POST', body })
     router.push('/my-requests')
-  } catch {
-    showError('Не удалось создать заявку. Попробуйте ещё раз.')
+  } catch (err) {
+    showError(`Не удалось создать заявку: ${errMsg(err)}`)
   } finally {
     submitting.value = false
   }

@@ -208,8 +208,8 @@ async function saveFaq() {
     await refresh()
     faqModal.value = false
     showSuccess('Сохранено')
-  } catch {
-    showError('Не удалось сохранить')
+  } catch (err) {
+    showError(`Не удалось сохранить: ${errMsg(err)}`)
   } finally {
     saving.value = false
   }
@@ -261,8 +261,8 @@ async function saveContact() {
     await refresh()
     contactModal.value = false
     showSuccess('Сохранено')
-  } catch {
-    showError('Не удалось сохранить')
+  } catch (err) {
+    showError(`Не удалось сохранить: ${errMsg(err)}`)
   } finally {
     saving.value = false
   }
@@ -287,8 +287,8 @@ async function confirmDelete() {
     await refresh()
     confirmTarget.value = null
     showSuccess('Удалено')
-  } catch {
-    showError('Не удалось удалить')
+  } catch (err) {
+    showError(`Не удалось удалить: ${errMsg(err)}`)
   } finally {
     saving.value = false
   }

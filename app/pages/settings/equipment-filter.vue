@@ -81,8 +81,8 @@ async function handleSave() {
   try {
     await save({ equipmentTypeIds: selected.value })
     showSuccess('Фильтр сохранён')
-  } catch {
-    showError('Не удалось сохранить фильтр. Попробуйте ещё раз.')
+  } catch (err) {
+    showError(`Не удалось сохранить фильтр: ${errMsg(err)}`)
   } finally {
     saving.value = false
   }
@@ -94,8 +94,8 @@ async function handleClear() {
     selected.value = []
     await save({ equipmentTypeIds: [] })
     showSuccess('Фильтр сброшен')
-  } catch {
-    showError('Не удалось сбросить фильтр. Попробуйте ещё раз.')
+  } catch (err) {
+    showError(`Не удалось сбросить фильтр: ${errMsg(err)}`)
   } finally {
     saving.value = false
   }

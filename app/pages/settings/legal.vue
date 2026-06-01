@@ -58,8 +58,8 @@ async function save() {
     })
     await refresh()
     showSuccess('Сохранено')
-  } catch {
-    showError('Не удалось сохранить')
+  } catch (err) {
+    showError(`Не удалось сохранить: ${errMsg(err)}`)
   } finally {
     saving.value = false
   }

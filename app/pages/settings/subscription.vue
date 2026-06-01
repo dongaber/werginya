@@ -83,8 +83,8 @@ async function buy() {
       body: { telegramId: telegramId.value, plan: selectedPlan.value },
     })
     await refresh()
-  } catch {
-    showError('Не удалось оформить подписку. Попробуйте ещё раз.')
+  } catch (err) {
+    showError(`Не удалось оформить подписку: ${errMsg(err)}`)
   } finally {
     buying.value = false
   }

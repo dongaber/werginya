@@ -104,8 +104,8 @@ async function save() {
     await refresh()
     modal.value = false
     showSuccess('Сохранено')
-  } catch {
-    showError('Не удалось сохранить. Попробуйте ещё раз.')
+  } catch (err) {
+    showError(`Не удалось сохранить: ${errMsg(err)}`)
   } finally {
     saving.value = false
   }
@@ -123,8 +123,8 @@ async function confirmDelete() {
     await refresh()
     confirmId.value = null
     showSuccess('Удалено')
-  } catch {
-    showError('Не удалось удалить. Попробуйте ещё раз.')
+  } catch (err) {
+    showError(`Не удалось удалить: ${errMsg(err)}`)
   } finally {
     saving.value = false
   }

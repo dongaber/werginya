@@ -86,9 +86,8 @@ async function register() {
     const userExists = useState('userExists')
     userExists.value = true
     await router.replace('/')
-  } catch (err: any) {
-    const msg = err?.data?.message || err?.message || 'Неизвестная ошибка'
-    showError(`Ошибка регистрации: ${msg}`)
+  } catch (err) {
+    showError(`Ошибка регистрации: ${errMsg(err)}`)
   } finally {
     loading.value = false
   }

@@ -72,7 +72,7 @@ async function handleViewContacts(id: number) {
     if (err?.data?.reason === 'limit_reached') {
       showSubscriptionModal.value = true
     } else {
-      showError('Не удалось открыть контакты')
+      showError(`Не удалось открыть контакты: ${errMsg(err)}`)
     }
   } finally {
     viewLoading.value = null

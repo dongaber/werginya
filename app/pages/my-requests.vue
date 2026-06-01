@@ -77,8 +77,8 @@ async function handleAction(id: number, status: string) {
     await $fetch(`/api/requests/${id}`, { method: 'PATCH', body: { status } })
     await reset()
     showSuccess('Статус заявки обновлён')
-  } catch {
-    showError('Не удалось обновить статус. Попробуйте ещё раз.')
+  } catch (err) {
+    showError(`Не удалось обновить статус: ${errMsg(err)}`)
   } finally {
     actionLoading.value = null
   }
