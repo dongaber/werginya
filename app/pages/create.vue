@@ -261,7 +261,7 @@ async function submit() {
 
 .action {
   padding: 12px 16px;
-  padding-bottom: max(12px, env(safe-area-inset-bottom));
+  padding-bottom: max(12px, env(safe-area-inset-bottom), var(--tg-safe-area-inset-bottom, 0px));
 }
 
 .action__btn {
