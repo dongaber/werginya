@@ -1,9 +1,5 @@
-function fireNotification(event: import('h3').H3Event, requestId: number) {
-  const origin = getRequestURL(event).origin
-  $fetch(`${origin}/_nitro/tasks/notify-new-request`, {
-    method: 'POST',
-    body: { payload: { requestId } },
-  }).catch(() => {})
+function fireNotification(requestId: number) {
+  runTask('notify-new-request', { payload: { requestId } }).catch(() => {})
 }
 
 export default defineEventHandler(async (event) => {
@@ -44,7 +40,7 @@ export default defineEventHandler(async (event) => {
       },
       include: requestInclude,
     })
-    fireNotification(event, data.id)
+    fireNotification(data.id)
     return serialize(data)
   }
 
@@ -61,7 +57,7 @@ export default defineEventHandler(async (event) => {
       },
       include: requestInclude,
     })
-    fireNotification(event, data.id)
+    fireNotification(data.id)
     return serialize(data)
   }
 
@@ -78,7 +74,7 @@ export default defineEventHandler(async (event) => {
       },
       include: requestInclude,
     })
-    fireNotification(event, data.id)
+    fireNotification(data.id)
     return serialize(data)
   }
 
