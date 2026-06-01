@@ -1,5 +1,7 @@
 interface UserFilters {
-  geoCity: string | null
+  geoLat: number | null
+  geoLng: number | null
+  geoRadiusKm: number | null
   equipmentTypeIds: number[]
 }
 
@@ -13,7 +15,7 @@ export function useUserFilters() {
     try {
       filters.value = await useNuxtApp().$apiFetch<UserFilters>('/api/user/filters')
     } catch {
-      filters.value = { geoCity: null, equipmentTypeIds: [] }
+      filters.value = { geoLat: null, geoLng: null, geoRadiusKm: null, equipmentTypeIds: [] }
     } finally {
       loading.value = false
     }
@@ -22,7 +24,9 @@ export function useUserFilters() {
   async function save(updates: Partial<UserFilters>) {
     await useNuxtApp().$apiFetch('/api/user/filters', { method: 'PATCH', body: updates })
     if (filters.value) {
-      if (updates.geoCity !== undefined) filters.value.geoCity = updates.geoCity
+      if (updates.geoLat !== undefined) filters.value.geoLat = updates.geoLat
+      if (updates.geoLng !== undefined) filters.value.geoLng = updates.geoLng
+      if (updates.geoRadiusKm !== undefined) filters.value.geoRadiusKm = updates.geoRadiusKm
       if (updates.equipmentTypeIds !== undefined) filters.value.equipmentTypeIds = updates.equipmentTypeIds
     }
   }

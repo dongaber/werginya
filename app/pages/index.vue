@@ -53,7 +53,9 @@ if (import.meta.client) {
 }
 
 const query = computed(() => ({
-  ...(filters.value?.geoCity ? { geoCity: filters.value.geoCity } : {}),
+  ...(filters.value?.geoLat != null && filters.value?.geoLng != null && filters.value?.geoRadiusKm
+    ? { geoLat: filters.value.geoLat, geoLng: filters.value.geoLng, geoRadiusKm: filters.value.geoRadiusKm }
+    : {}),
   ...(filters.value?.equipmentTypeIds?.length ? { equipmentTypeIds: filters.value.equipmentTypeIds } : {}),
 }))
 

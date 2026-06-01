@@ -4,37 +4,56 @@
 
     <div class="section">
       <p class="section__hint">
-        Введите название города или района. Будут показаны только заявки с адресами, содержащими этот текст.
+        Выберите точку на карте и задайте радиус. Будут показаны заявки с адресами в этом радиусе.
       </p>
 
-      <div class="field">
-        <input
-          v-model="city"
-          class="field__input"
-          type="text"
-          placeholder="Например: Москва"
-          maxlength="100"
-        />
-        <button v-if="city" class="field__clear" @click="city = ''">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
-            <path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-          </svg>
-        </button>
-      </div>
+      <AppAddressPicker
+        v-model="addressText"
+        placeholder="Поиск адреса для навигации..."
+        :init-lat="selectedLat"
+        :init-lng="selectedLng"
+        @select="onMapSelect"
+      />
 
-      <div v-if="active" class="active-badge">
+      <div v-if="selectedLat && selectedLng" class="coords-badge">
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24">
           <path fill="currentColor" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7m0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5"/>
         </svg>
-        Активен: {{ filters?.geoCity }}
+        {{ selectedLat.toFixed(4) }}, {{ selectedLng.toFixed(4) }}
       </div>
     </div>
 
+    <div class="radius-section">
+      <p class="radius-label">Радиус поиска</p>
+      <div class="radius-grid">
+        <button
+          v-for="r in RADIUS_OPTIONS"
+          :key="r"
+          class="radius-btn"
+          :class="{ 'radius-btn--active': selectedRadius === r }"
+          @click="selectedRadius = r"
+        >
+          {{ r }} км
+        </button>
+      </div>
+    </div>
+
+    <div v-if="isActive" class="active-badge">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7m0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5"/>
+      </svg>
+      Активен: {{ filters?.geoRadiusKm }} км
+    </div>
+
     <div class="actions">
-      <button class="btn btn--primary" :disabled="saving || city === (filters?.geoCity ?? '')" @click="handleSave">
-        {{ saving ? 'Сохранение...' : 'Сохранить' }}
+      <button
+        class="btn btn--primary"
+        :disabled="saving || !canSave"
+        @click="handleSave"
+      >
+        {{ saving ? 'Сохранение...' : 'Сохранить фильтр' }}
       </button>
-      <button v-if="filters?.geoCity" class="btn btn--danger" :disabled="saving" @click="handleClear">
+      <button v-if="isActive" class="btn btn--danger" :disabled="saving" @click="handleClear">
         Сбросить фильтр
       </button>
     </div>
@@ -42,23 +61,44 @@
 </template>
 
 <script setup lang="ts">
-const { filters, load, save, invalidate } = useUserFilters()
+const RADIUS_OPTIONS = [10, 25, 50, 100, 200]
+
+const { filters, load, save } = useUserFilters()
 const { success: showSuccess, error: showError } = useToast()
 
-const city = ref('')
+const addressText = ref('')
+const selectedLat = ref<number | null>(null)
+const selectedLng = ref<number | null>(null)
+const selectedRadius = ref<number>(50)
 const saving = ref(false)
 
-const active = computed(() => !!filters.value?.geoCity)
+const isActive = computed(() => filters.value?.geoLat != null && filters.value?.geoRadiusKm != null)
+
+const canSave = computed(() =>
+  selectedLat.value != null && selectedLng.value != null && selectedRadius.value > 0
+)
 
 onMounted(async () => {
   await load()
-  city.value = filters.value?.geoCity ?? ''
+  if (filters.value?.geoLat != null) selectedLat.value = filters.value.geoLat
+  if (filters.value?.geoLng != null) selectedLng.value = filters.value.geoLng
+  if (filters.value?.geoRadiusKm != null) selectedRadius.value = filters.value.geoRadiusKm
 })
 
+function onMapSelect(r: { value: string; lat: number | null; lng: number | null }) {
+  if (r.lat != null) selectedLat.value = r.lat
+  if (r.lng != null) selectedLng.value = r.lng
+}
+
 async function handleSave() {
+  if (!canSave.value) return
   saving.value = true
   try {
-    await save({ geoCity: city.value.trim() || null })
+    await save({
+      geoLat: selectedLat.value,
+      geoLng: selectedLng.value,
+      geoRadiusKm: selectedRadius.value,
+    })
     showSuccess('Фильтр сохранён')
   } catch (err) {
     showError(`Не удалось сохранить фильтр: ${errMsg(err)}`)
@@ -70,8 +110,9 @@ async function handleSave() {
 async function handleClear() {
   saving.value = true
   try {
-    city.value = ''
-    await save({ geoCity: null })
+    selectedLat.value = null
+    selectedLng.value = null
+    await save({ geoLat: null, geoLng: null, geoRadiusKm: null })
     showSuccess('Фильтр сброшен')
   } catch (err) {
     showError(`Не удалось сбросить фильтр: ${errMsg(err)}`)
@@ -90,7 +131,7 @@ async function handleClear() {
   padding: 16px 16px 0;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .section__hint {
@@ -99,38 +140,52 @@ async function handleClear() {
   line-height: 1.5;
 }
 
-.field {
-  position: relative;
-}
-
-.field__input {
-  width: 100%;
-  padding: 12px 40px 12px 14px;
-  border-radius: 12px;
-  border: 1.5px solid color-mix(in srgb, var(--tg-hint) 20%, transparent);
-  background: var(--tg-secondary-bg);
-  color: var(--tg-text);
-  font-size: 15px;
-  outline: none;
-  transition: border-color 0.15s ease;
-}
-
-.field__input:focus {
-  border-color: var(--tg-button);
-}
-
-.field__clear {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  padding: 4px;
-  cursor: pointer;
-  color: var(--tg-hint);
+.coords-badge {
   display: flex;
   align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--tg-hint);
+  font-family: monospace;
+}
+
+.radius-section {
+  padding: 16px 16px 0;
+}
+
+.radius-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--tg-hint);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 10px;
+}
+
+.radius-grid {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.radius-btn {
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 2px solid color-mix(in srgb, var(--tg-hint) 20%, transparent);
+  background: var(--tg-secondary-bg);
+  color: var(--tg-text);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+  font-family: inherit;
+}
+
+.radius-btn--active {
+  border-color: var(--tg-button);
+  background: color-mix(in srgb, var(--tg-button) 10%, var(--tg-secondary-bg));
+  color: var(--tg-button);
 }
 
 .active-badge {
@@ -140,6 +195,8 @@ async function handleClear() {
   font-size: 13px;
   color: var(--tg-button);
   font-weight: 500;
+  padding: 0 16px;
+  margin-top: 12px;
 }
 
 .actions {
@@ -159,6 +216,7 @@ async function handleClear() {
   cursor: pointer;
   transition: opacity 0.15s ease;
   -webkit-tap-highlight-color: transparent;
+  font-family: inherit;
 }
 
 .btn:disabled {
