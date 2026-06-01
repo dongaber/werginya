@@ -1,0 +1,15 @@
+services:
+  studio:
+    build:
+      context: .
+      dockerfile: Dockerfile.studio
+    ports:
+      - '5555:5555'
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-special_equipment}
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    external: true
