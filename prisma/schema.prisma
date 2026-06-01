@@ -16,7 +16,9 @@ model User {
   createdAt             DateTime  @default(now())
   subscriptionExpiresAt DateTime?
   isAdmin               Boolean   @default(false)
-  filterGeoCity         String?
+  filterGeoLat          Decimal?  @db.Decimal(10, 7)
+  filterGeoLng          Decimal?  @db.Decimal(10, 7)
+  filterGeoRadiusKm     Int?
   filterEquipIds        Int[]     @default([])
   requests              Request[]
   contactViews          ContactView[]
