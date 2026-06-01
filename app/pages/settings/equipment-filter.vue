@@ -17,7 +17,7 @@
           :class="{ 'item--selected': selected.includes(eq.id) }"
           @click="toggle(eq.id)"
         >
-          <span class="item__icon">{{ eq.icon }}</span>
+          <img :src="eq.icon" :alt="eq.name" class="item__icon" />
           <span class="item__name">{{ eq.name }}</span>
           <svg v-if="selected.includes(eq.id)" class="item__check" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
             <path fill="currentColor" d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
@@ -150,7 +150,9 @@ async function handleClear() {
 }
 
 .item__icon {
-  font-size: 22px;
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
   flex-shrink: 0;
 }
 
