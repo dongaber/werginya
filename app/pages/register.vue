@@ -52,6 +52,7 @@ const router = useRouter()
 const agreedToTerms = ref(false)
 const agreedToPrivacy = ref(false)
 const loading = ref(false)
+const { error: showError } = useToast()
 
 const canRegister = computed(() => agreedToTerms.value && agreedToPrivacy.value)
 
@@ -83,6 +84,8 @@ async function register() {
     const userExists = useState('userExists')
     userExists.value = true
     await router.replace('/')
+  } catch {
+    showError('Не удалось завершить регистрацию. Попробуйте ещё раз.')
   } finally {
     loading.value = false
   }

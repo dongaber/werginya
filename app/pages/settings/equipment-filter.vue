@@ -53,7 +53,7 @@ interface EquipmentType {
 }
 
 const { filters, load, save } = useUserFilters()
-const { success: showSuccess } = useToast()
+const { success: showSuccess, error: showError } = useToast()
 
 const { data: equipmentTypes, pending } = useLazyFetch<EquipmentType[]>('/api/equipment-types')
 
@@ -81,6 +81,8 @@ async function handleSave() {
   try {
     await save({ equipmentTypeIds: selected.value })
     showSuccess('Фильтр сохранён')
+  } catch {
+    showError('Не удалось сохранить фильтр. Попробуйте ещё раз.')
   } finally {
     saving.value = false
   }
@@ -92,6 +94,8 @@ async function handleClear() {
     selected.value = []
     await save({ equipmentTypeIds: [] })
     showSuccess('Фильтр сброшен')
+  } catch {
+    showError('Не удалось сбросить фильтр. Попробуйте ещё раз.')
   } finally {
     saving.value = false
   }

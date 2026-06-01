@@ -73,6 +73,7 @@ const plans = [
 
 const selectedPlan = ref('month_1')
 const buying = ref(false)
+const { error: showError } = useToast()
 
 async function buy() {
   buying.value = true
@@ -82,6 +83,8 @@ async function buy() {
       body: { telegramId: telegramId.value, plan: selectedPlan.value },
     })
     await refresh()
+  } catch {
+    showError('Не удалось оформить подписку. Попробуйте ещё раз.')
   } finally {
     buying.value = false
   }

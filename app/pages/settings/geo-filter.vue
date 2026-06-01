@@ -43,7 +43,7 @@
 
 <script setup lang="ts">
 const { filters, load, save, invalidate } = useUserFilters()
-const { success: showSuccess } = useToast()
+const { success: showSuccess, error: showError } = useToast()
 
 const city = ref('')
 const saving = ref(false)
@@ -60,6 +60,8 @@ async function handleSave() {
   try {
     await save({ geoCity: city.value.trim() || null })
     showSuccess('Фильтр сохранён')
+  } catch {
+    showError('Не удалось сохранить фильтр. Попробуйте ещё раз.')
   } finally {
     saving.value = false
   }
@@ -71,6 +73,8 @@ async function handleClear() {
     city.value = ''
     await save({ geoCity: null })
     showSuccess('Фильтр сброшен')
+  } catch {
+    showError('Не удалось сбросить фильтр. Попробуйте ещё раз.')
   } finally {
     saving.value = false
   }
