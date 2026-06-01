@@ -24,10 +24,9 @@ export default defineEventHandler(async (event) => {
   const expiresAt = new Date()
   expiresAt.setMonth(expiresAt.getMonth() + months)
 
-  const user = await prisma.user.upsert({
+  const user = await prisma.user.update({
     where: { telegramId: BigInt(telegramId) },
-    update: { subscriptionExpiresAt: expiresAt },
-    create: { telegramId: BigInt(telegramId), firstName: 'User', subscriptionExpiresAt: expiresAt },
+    data: { subscriptionExpiresAt: expiresAt },
     select: { subscriptionExpiresAt: true },
   })
 

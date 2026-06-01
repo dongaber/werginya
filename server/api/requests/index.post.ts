@@ -9,11 +9,11 @@ export default defineEventHandler(async (event) => {
   if (!body?.type) throw createError({ statusCode: 400, message: 'type is required' })
   if (!body?.paymentType) throw createError({ statusCode: 400, message: 'paymentType is required' })
 
-  const user = await prisma.user.upsert({
+  const user = await prisma.user.findUnique({
     where: { telegramId: BigInt(telegramId) },
-    update: {},
-    create: { telegramId: BigInt(telegramId), firstName: 'User' },
+    select: { id: true },
   })
+  if (!user) throw createError({ statusCode: 403, message: 'User not registered' })
   const userId = user.id
 
   const { type, paymentType, rental, transportation, delivery, contactPhone, contactTelegram, contactWhatsapp } = body
