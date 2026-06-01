@@ -6,9 +6,6 @@ export default defineEventHandler(async (event) => {
 
   const body = await readBody(event)
 
-  if (body.geoCity !== undefined && body.geoCity !== null && typeof body.geoCity !== 'string') {
-    throw createError({ statusCode: 400, message: 'geoCity must be a string or null' })
-  }
   if (body.equipmentTypeIds !== undefined) {
     if (!Array.isArray(body.equipmentTypeIds) || body.equipmentTypeIds.some((id: unknown) => typeof id !== 'number')) {
       throw createError({ statusCode: 400, message: 'equipmentTypeIds must be an array of numbers' })
@@ -24,7 +21,9 @@ export default defineEventHandler(async (event) => {
   await prisma.user.update({
     where: { id: user.id },
     data: {
-      ...(body.geoCity !== undefined && { filterGeoCity: body.geoCity || null }),
+      ...(body.geoLat !== undefined && { filterGeoLat: body.geoLat }),
+      ...(body.geoLng !== undefined && { filterGeoLng: body.geoLng }),
+      ...(body.geoRadiusKm !== undefined && { filterGeoRadiusKm: body.geoRadiusKm }),
       ...(body.equipmentTypeIds !== undefined && { filterEquipIds: body.equipmentTypeIds }),
     },
   })

@@ -4,11 +4,13 @@ export default defineEventHandler(async (event) => {
 
   const user = await prisma.user.findUnique({
     where: { telegramId: BigInt(telegramId) },
-    select: { filterGeoCity: true, filterEquipIds: true },
+    select: { filterGeoLat: true, filterGeoLng: true, filterGeoRadiusKm: true, filterEquipIds: true },
   })
 
   return {
-    geoCity: user?.filterGeoCity ?? null,
+    geoLat: user?.filterGeoLat != null ? Number(user.filterGeoLat) : null,
+    geoLng: user?.filterGeoLng != null ? Number(user.filterGeoLng) : null,
+    geoRadiusKm: user?.filterGeoRadiusKm ?? null,
     equipmentTypeIds: user?.filterEquipIds ?? [],
   }
 })

@@ -1,5 +1,5 @@
 export default defineEventHandler(async (event) => {
-  const { status, type, mine, cursor, take, geoCity, equipmentTypeIds } = getQuery(event)
+  const { status, type, mine, cursor, take, geoLat, geoLng, geoRadiusKm, equipmentTypeIds } = getQuery(event)
 
   let resolvedUserId: number | undefined
   if (mine) {
@@ -16,22 +16,39 @@ export default defineEventHandler(async (event) => {
   const takeNum = take ? Math.min(Number(take), 50) : 20
   const cursorId = cursor ? Number(cursor) : undefined
 
-  const geoCityStr = geoCity ? String(geoCity).trim() : undefined
   const equipIds = equipmentTypeIds
     ? (Array.isArray(equipmentTypeIds) ? equipmentTypeIds : [equipmentTypeIds]).map(Number).filter(Boolean)
     : []
 
   const AND: any[] = []
 
-  if (geoCityStr) {
-    AND.push({
-      OR: [
-        { rental: { address: { contains: geoCityStr, mode: 'insensitive' } } },
-        { transportation: { fromAddress: { contains: geoCityStr, mode: 'insensitive' } } },
-        { transportation: { toAddress: { contains: geoCityStr, mode: 'insensitive' } } },
-        { delivery: { toAddress: { contains: geoCityStr, mode: 'insensitive' } } },
-      ],
-    })
+  const lat = geoLat ? parseFloat(String(geoLat)) : null
+  const lng = geoLng ? parseFloat(String(geoLng)) : null
+  const radius = geoRadiusKm ? parseFloat(String(geoRadiusKm)) : null
+
+  if (lat != null && lng != null && radius != null) {
+    type GeoRow = { id: bigint }
+    const rows = await prisma.$queryRaw<GeoRow[]>`
+      SELECT DISTINCT r.id FROM "Request" r
+      LEFT JOIN "Rental"         ren  ON ren."requestId"  = r.id
+      LEFT JOIN "Transportation" tr   ON tr."requestId"   = r.id
+      LEFT JOIN "Delivery"       del  ON del."requestId"  = r.id
+      WHERE (
+        (ren.lat  IS NOT NULL AND ren.lng  IS NOT NULL AND
+          6371 * acos(LEAST(1, cos(radians(${lat})) * cos(radians(ren.lat::float))  * cos(radians(ren.lng::float)  - radians(${lng})) + sin(radians(${lat})) * sin(radians(ren.lat::float))))  <= ${radius})
+        OR
+        (tr."fromLat" IS NOT NULL AND tr."fromLng" IS NOT NULL AND
+          6371 * acos(LEAST(1, cos(radians(${lat})) * cos(radians(tr."fromLat"::float)) * cos(radians(tr."fromLng"::float) - radians(${lng})) + sin(radians(${lat})) * sin(radians(tr."fromLat"::float)))) <= ${radius})
+        OR
+        (tr."toLat" IS NOT NULL AND tr."toLng" IS NOT NULL AND
+          6371 * acos(LEAST(1, cos(radians(${lat})) * cos(radians(tr."toLat"::float))  * cos(radians(tr."toLng"::float)  - radians(${lng})) + sin(radians(${lat})) * sin(radians(tr."toLat"::float))))  <= ${radius})
+        OR
+        (del."toLat" IS NOT NULL AND del."toLng" IS NOT NULL AND
+          6371 * acos(LEAST(1, cos(radians(${lat})) * cos(radians(del."toLat"::float)) * cos(radians(del."toLng"::float) - radians(${lng})) + sin(radians(${lat})) * sin(radians(del."toLat"::float)))) <= ${radius})
+      )
+    `
+    const ids = rows.map(r => Number(r.id))
+    AND.push({ id: { in: ids } })
   }
 
   if (equipIds.length > 0) {
