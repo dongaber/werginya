@@ -34,10 +34,11 @@
 <script setup lang="ts">
 const { telegramId, fullName, username, avatarLetter } = useTelegram()
 
-const { data: meData } = await useFetch<{ isAdmin: boolean; subscriptionActive: boolean }>(
-  '/api/me',
-  { query: { telegramId: telegramId.value } }
-)
+const { data: meData } = await useFetch('/api/me', {
+  query: { telegramId: telegramId.value },
+  getCachedData: () => undefined,
+  transform: (data: { isAdmin: boolean; subscriptionActive: boolean }) => data,
+})
 
 const subActive = computed(() => meData.value?.subscriptionActive ?? false)
 const isAdmin = computed(() => meData.value?.isAdmin ?? false)
