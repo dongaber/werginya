@@ -88,6 +88,41 @@
       <div v-else class="empty">Контактов пока нет</div>
     </section>
 
+    <!-- Legal documents -->
+    <section v-if="legal?.termsUrl || legal?.privacyUrl" class="section">
+      <div class="section__header">
+        <h2 class="section__title">Правовые документы</h2>
+      </div>
+      <div class="contacts">
+        <a v-if="legal?.termsUrl" :href="legal.termsUrl" target="_blank" class="contact">
+          <span class="contact__icon contact__icon--doc">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
+              <path fill="currentColor" d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zm4 18H6V4h7v5h5zM9 13h6v2H9zm0 4h6v2H9z"/>
+            </svg>
+          </span>
+          <div class="contact__info">
+            <span class="contact__label">Оферта</span>
+          </div>
+          <svg class="contact__arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+            <path fill="currentColor" d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/>
+          </svg>
+        </a>
+        <a v-if="legal?.privacyUrl" :href="legal.privacyUrl" target="_blank" class="contact">
+          <span class="contact__icon contact__icon--doc">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
+              <path fill="currentColor" d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5zm0 4a3 3 0 1 1 0 6 3 3 0 0 1 0-6zm0 14c-2.67 0-5.04-1.33-6.5-3.37C7.04 13.95 9.36 13 12 13s4.96.95 6.5 2.63C17.04 17.67 14.67 19 12 19z"/>
+            </svg>
+          </span>
+          <div class="contact__info">
+            <span class="contact__label">Политика конфиденциальности</span>
+          </div>
+          <svg class="contact__arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+            <path fill="currentColor" d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/>
+          </svg>
+        </a>
+      </div>
+    </section>
+
     <!-- FAQ modal -->
     <AppBottomSheet v-model="faqModal">
       <h2 class="sheet-title">{{ editingFaq ? 'Редактировать вопрос' : 'Новый вопрос' }}</h2>
@@ -166,6 +201,11 @@ const { data, refresh } = await useAsyncData(
     faq: { id: number; question: string; answer: string; order: number }[]
     contacts: { id: number; label: string; type: string; value: string; url: string; order: number }[]
   }>('/api/help')
+)
+
+const { data: legal } = await useAsyncData(
+  'help-legal',
+  () => useNuxtApp().$apiFetch<{ termsUrl: string; privacyUrl: string }>('/api/legal')
 )
 
 const faq = computed(() => data.value?.faq ?? [])
@@ -453,6 +493,11 @@ async function confirmDelete() {
 .contact__icon--phone {
   background: color-mix(in srgb, #22c55e 15%, transparent);
   color: #22c55e;
+}
+
+.contact__icon--doc {
+  background: color-mix(in srgb, var(--tg-hint) 15%, transparent);
+  color: var(--tg-hint);
 }
 
 .contact__icon--email {
