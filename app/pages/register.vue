@@ -45,7 +45,6 @@
 definePageMeta({ layout: false })
 
 const { firstName, lastName, username } = useTelegram()
-const { $apiFetch } = useNuxtApp()
 
 const { data: legal } = await useFetch<{ termsUrl: string; privacyUrl: string }>('/api/legal')
 const router = useRouter()
@@ -59,6 +58,7 @@ const canRegister = computed(() => agreedToTerms.value && agreedToPrivacy.value)
 
 onMounted(async () => {
   try {
+    const { $apiFetch } = useNuxtApp()
     const data = await $apiFetch<{ exists: boolean }>('/api/me')
     if (data.exists) {
       const userExists = useState('userExists')
@@ -72,6 +72,7 @@ async function register() {
   if (!canRegister.value) return
   loading.value = true
   try {
+    const { $apiFetch } = useNuxtApp()
     await $apiFetch('/api/users', {
       method: 'POST',
       body: {
