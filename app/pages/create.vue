@@ -92,21 +92,16 @@ const canProceed = computed(() => {
 })
 
 function isDetailsValid() {
-  if (!detailsForm.startsAt) return false
+  const { startsAt, equipmentTypeId, address, durationDays, cargo, fromAddress, toAddress, ratePerHour, volume } = detailsForm
+  if (!startsAt) return false
   if (form.type === 'RENTAL') {
-    return !!detailsForm.equipmentTypeId && !!detailsForm.address && detailsForm.durationDays >= 1
+    return !!equipmentTypeId && !!address && durationDays >= 1
   }
   if (form.type === 'TRANSPORTATION') {
-    return (
-      !!detailsForm.equipmentTypeId &&
-      !!detailsForm.cargo &&
-      !!detailsForm.fromAddress &&
-      !!detailsForm.toAddress &&
-      detailsForm.ratePerHour >= 0
-    )
+    return !!equipmentTypeId && !!cargo && !!fromAddress && !!toAddress && ratePerHour >= 0
   }
   if (form.type === 'DELIVERY') {
-    return !!detailsForm.cargo && !!detailsForm.toAddress && !!detailsForm.volume
+    return !!cargo && !!toAddress && !!volume
   }
   return false
 }
