@@ -46,7 +46,10 @@ definePageMeta({ layout: false })
 
 const { firstName, lastName, username } = useTelegram()
 
-const { data: legal } = await useFetch<{ termsUrl: string; privacyUrl: string }>('/api/legal')
+const { data: legal } = await useAsyncData(
+  'register-legal',
+  () => useNuxtApp().$apiFetch<{ termsUrl: string; privacyUrl: string }>('/api/legal')
+)
 const router = useRouter()
 
 const agreedToTerms = ref(false)

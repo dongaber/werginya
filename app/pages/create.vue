@@ -43,8 +43,9 @@
 <script setup lang="ts">
 const router = useRouter()
 
-const { data: equipmentTypes } = await useFetch<{ id: number; name: string; icon: string }[]>(
-  '/api/equipment-types'
+const { data: equipmentTypes } = await useAsyncData(
+  'equipment-types',
+  () => useNuxtApp().$apiFetch<{ id: number; name: string; icon: string }[]>('/api/equipment-types')
 )
 
 const totalSteps = 5
