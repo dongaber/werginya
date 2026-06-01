@@ -84,6 +84,14 @@ const allItems = [
       <path fill="currentColor" d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2m-7 3a3 3 0 0 1 3 3 3 3 0 0 1-3 3 3 3 0 0 1-3-3 3 3 0 0 1 3-3m6 13H6v-1c0-2 4-3.1 6-3.1s6 1.1 6 3.1z"/>
     </svg>`,
   },
+  {
+    to: '/settings/legal',
+    label: 'Правовые документы',
+    adminOnly: true,
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
+      <path fill="currentColor" d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zm4 18H6V4h7v5h5zM9 13h6v2H9zm0 4h6v2H9z"/>
+    </svg>`,
+  },
 ]
 
 const items = computed(() => allItems.filter(item => !item.adminOnly || isAdmin.value))
