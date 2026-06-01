@@ -1,3 +1,11 @@
+function fireNotification(event: import('h3').H3Event, requestId: number) {
+  const origin = getRequestURL(event).origin
+  $fetch(`${origin}/_nitro/tasks/notify-new-request`, {
+    method: 'POST',
+    body: { payload: { requestId } },
+  }).catch(() => {})
+}
+
 export default defineEventHandler(async (event) => {
   const telegramId = event.context.telegramId
   if (!telegramId) throw createError({ statusCode: 401, message: 'Unauthorized' })
@@ -36,6 +44,7 @@ export default defineEventHandler(async (event) => {
       },
       include: requestInclude,
     })
+    fireNotification(event, data.id)
     return serialize(data)
   }
 
@@ -52,6 +61,7 @@ export default defineEventHandler(async (event) => {
       },
       include: requestInclude,
     })
+    fireNotification(event, data.id)
     return serialize(data)
   }
 
@@ -68,6 +78,7 @@ export default defineEventHandler(async (event) => {
       },
       include: requestInclude,
     })
+    fireNotification(event, data.id)
     return serialize(data)
   }
 

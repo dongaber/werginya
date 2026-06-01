@@ -9,6 +9,9 @@ export default defineNuxtConfig({
       yandexMapsKey: process.env.YANDEX_MAPS_KEY ?? '',
     },
   },
+  nitro: {
+    experimental: { tasks: true },
+  },
   modules: ['@nuxt/eslint'],
   eslint: {
     config: {},
