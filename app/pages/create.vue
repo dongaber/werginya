@@ -64,8 +64,14 @@ const form = reactive<{
 const detailsForm = reactive<Record<string, any>>({
   equipmentTypeId: null,
   address: '',
+  addressLat: null as number | null,
+  addressLng: null as number | null,
   fromAddress: '',
+  fromLat: null as number | null,
+  fromLng: null as number | null,
   toAddress: '',
+  toLat: null as number | null,
+  toLng: null as number | null,
   cargo: '',
   startsAt: '',
   durationDays: 1,
@@ -152,6 +158,8 @@ async function submit() {
       body.rental = {
         equipmentTypeId: detailsForm.equipmentTypeId,
         address: detailsForm.address,
+        lat: detailsForm.addressLat,
+        lng: detailsForm.addressLng,
         startsAt: new Date(detailsForm.startsAt).toISOString(),
         durationDays: detailsForm.durationDays,
       }
@@ -160,7 +168,11 @@ async function submit() {
         equipmentTypeId: detailsForm.equipmentTypeId,
         cargo: detailsForm.cargo,
         fromAddress: detailsForm.fromAddress,
+        fromLat: detailsForm.fromLat,
+        fromLng: detailsForm.fromLng,
         toAddress: detailsForm.toAddress,
+        toLat: detailsForm.toLat,
+        toLng: detailsForm.toLng,
         startsAt: new Date(detailsForm.startsAt).toISOString(),
         ratePerHour: detailsForm.ratePerHour,
       }
@@ -168,6 +180,8 @@ async function submit() {
       body.delivery = {
         cargo: detailsForm.cargo,
         toAddress: detailsForm.toAddress,
+        toLat: detailsForm.toLat,
+        toLng: detailsForm.toLng,
         startsAt: new Date(detailsForm.startsAt).toISOString(),
         volume: detailsForm.volume,
       }

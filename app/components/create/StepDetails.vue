@@ -28,16 +28,20 @@
     <!-- From address (transportation) -->
     <template v-if="type === 'TRANSPORTATION'">
       <AppFormField label="Откуда">
-        <input v-model="form.fromAddress" class="input" placeholder="Адрес отправления" />
+        <AppAddressPicker
+          v-model="form.fromAddress"
+          placeholder="Адрес отправления"
+          @select="r => { form.fromLat = r.lat; form.fromLng = r.lng }"
+        />
       </AppFormField>
     </template>
 
-    <!-- To address (rental + transportation + delivery) -->
-    <AppFormField :label="type === 'RENTAL' ? 'Куда' : 'Куда'">
-      <input
+    <!-- To/destination address (all types) -->
+    <AppFormField :label="type === 'RENTAL' ? 'Адрес' : 'Куда'">
+      <AppAddressPicker
         v-model="toAddress"
-        class="input"
-        placeholder="Адрес назначения"
+        :placeholder="type === 'RENTAL' ? 'Адрес объекта' : 'Адрес назначения'"
+        @select="onToAddressSelect"
       />
     </AppFormField>
 
@@ -72,8 +76,9 @@
 <script setup lang="ts">
 const props = defineProps<{ type: string; form: Record<string, any> }>()
 
-const { data: equipmentTypes } = await useFetch<{ id: number; name: string; icon: string }[]>(
-  '/api/equipment-types'
+const { data: equipmentTypes } = await useAsyncData(
+  'step-details-equipment-types',
+  () => useNuxtApp().$apiFetch<{ id: number; name: string; icon: string }[]>('/api/equipment-types')
 )
 
 const toAddress = computed({
@@ -83,6 +88,16 @@ const toAddress = computed({
     else props.form.toAddress = v
   },
 })
+
+function onToAddressSelect(r: { value: string; lat: number | null; lng: number | null }) {
+  if (props.type === 'RENTAL') {
+    props.form.addressLat = r.lat
+    props.form.addressLng = r.lng
+  } else {
+    props.form.toLat = r.lat
+    props.form.toLng = r.lng
+  }
+}
 </script>
 
 <style scoped>
