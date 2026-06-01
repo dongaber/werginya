@@ -4,6 +4,7 @@
   <NuxtLayout>
     <NuxtPage :transition="pageTransition" />
   </NuxtLayout>
+  <AppToastList />
 </template>
 
 <script setup lang="ts">

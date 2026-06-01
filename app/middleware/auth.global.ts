@@ -7,7 +7,8 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
   if (userExists.value === null) {
     try {
-      const data = await $fetch<{ exists: boolean }>('/api/me')
+      const { $apiFetch } = useNuxtApp()
+      const data = await $apiFetch<{ exists: boolean }>('/api/me')
       userExists.value = data.exists
     } catch {
       userExists.value = false

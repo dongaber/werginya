@@ -4,7 +4,6 @@
       <slot />
     </main>
     <AppNav v-if="route.path !== '/create'" />
-    <AppToastList />
   </div>
 </template>
 

@@ -11,16 +11,16 @@ export default defineNuxtPlugin(() => {
     return headers
   }
 
-  return {
-    provide: {
-      apiFetch: $fetch.create({
-        onRequest({ options }) {
-          const existing = options.headers
-            ? Object.fromEntries(new Headers(options.headers as HeadersInit).entries())
-            : {}
-          options.headers = new Headers({ ...getHeaders(), ...existing })
-        },
-      }),
+  const apiFetch: typeof $fetch = $fetch.create({
+    onRequest({ options }) {
+      const existing = options.headers
+        ? Object.fromEntries(new Headers(options.headers as HeadersInit).entries())
+        : {}
+      options.headers = new Headers({ ...getHeaders(), ...existing })
     },
+  }) as typeof $fetch
+
+  return {
+    provide: { apiFetch },
   }
 })
