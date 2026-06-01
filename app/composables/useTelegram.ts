@@ -43,6 +43,16 @@ export function useTelegram() {
     tg?.close()
   }
 
+  function showBackButton(onClick: () => void) {
+    tg?.BackButton.onClick(onClick)
+    tg?.BackButton.show()
+  }
+
+  function hideBackButton(onClick?: () => void) {
+    if (onClick) tg?.BackButton.offClick(onClick)
+    tg?.BackButton.hide()
+  }
+
   return {
     tg,
     tgUser,
@@ -61,5 +71,7 @@ export function useTelegram() {
     showConfirm,
     haptic,
     close,
+    showBackButton,
+    hideBackButton,
   }
 }

@@ -130,8 +130,15 @@ async function nextStep() {
   step.value++
 }
 
-const { telegramId } = useTelegram()
+const { telegramId, showBackButton, hideBackButton } = useTelegram()
 const { error: showError } = useToast()
+
+function handleBack() {
+  router.back()
+}
+
+onMounted(() => showBackButton(handleBack))
+onUnmounted(() => hideBackButton(handleBack))
 
 async function submit() {
   submitting.value = true
