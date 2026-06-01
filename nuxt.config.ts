@@ -3,6 +3,12 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   ssr: false,
   devtools: { enabled: true },
+  runtimeConfig: {
+    public: {
+      dadataToken: process.env.DADATA_TOKEN ?? '',
+      yandexMapsKey: process.env.YANDEX_MAPS_KEY ?? '',
+    },
+  },
   modules: ['@nuxt/eslint'],
   eslint: {
     config: {},
