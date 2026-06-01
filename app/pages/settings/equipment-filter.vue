@@ -55,7 +55,10 @@ interface EquipmentType {
 const { filters, load, save } = useUserFilters()
 const { success: showSuccess, error: showError } = useToast()
 
-const { data: equipmentTypes, pending } = useLazyFetch<EquipmentType[]>('/api/equipment-types')
+const { data: equipmentTypes, pending } = useAsyncData(
+  'filter-equipment-types',
+  () => useNuxtApp().$apiFetch<EquipmentType[]>('/api/equipment-types')
+)
 
 const selected = ref<number[]>([])
 const saving = ref(false)

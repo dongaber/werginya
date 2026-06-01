@@ -34,9 +34,9 @@
 </template>
 
 <script setup lang="ts">
-const { data, refresh } = await useFetch<{ termsUrl: string; privacyUrl: string }>(
-  '/api/legal',
-  { getCachedData: () => undefined }
+const { data, refresh } = await useAsyncData(
+  'legal',
+  () => useNuxtApp().$apiFetch<{ termsUrl: string; privacyUrl: string }>('/api/legal')
 )
 
 const termsUrl = ref(data.value?.termsUrl ?? '')

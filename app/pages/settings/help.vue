@@ -154,16 +154,19 @@ const { $apiFetch } = useNuxtApp()
 const { telegramId } = useTelegram()
 const { error: showError, success: showSuccess } = useToast()
 
-const { data: meData } = await useFetch<{ isAdmin: boolean; subscriptionActive: boolean }>(
-  '/api/me',
-  { query: { telegramId: telegramId.value } }
+const { data: meData } = await useAsyncData(
+  'help-me',
+  () => useNuxtApp().$apiFetch<{ isAdmin: boolean; subscriptionActive: boolean }>('/api/me')
 )
 const isAdmin = computed(() => meData.value?.isAdmin ?? false)
 
-const { data, refresh } = await useFetch<{
-  faq: { id: number; question: string; answer: string; order: number }[]
-  contacts: { id: number; label: string; type: string; value: string; url: string; order: number }[]
-}>('/api/help')
+const { data, refresh } = await useAsyncData(
+  'help-data',
+  () => useNuxtApp().$apiFetch<{
+    faq: { id: number; question: string; answer: string; order: number }[]
+    contacts: { id: number; label: string; type: string; value: string; url: string; order: number }[]
+  }>('/api/help')
+)
 
 const faq = computed(() => data.value?.faq ?? [])
 const contacts = computed(() => data.value?.contacts ?? [])

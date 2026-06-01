@@ -62,8 +62,9 @@
 const { $apiFetch } = useNuxtApp()
 const { error: showError, success: showSuccess } = useToast()
 
-const { data, pending, refresh } = await useFetch<{ id: number; name: string; icon: string }[]>(
-  '/api/equipment-types'
+const { data, pending, refresh } = await useAsyncData(
+  'admin-equipment-types',
+  () => useNuxtApp().$apiFetch<{ id: number; name: string; icon: string }[]>('/api/equipment-types')
 )
 
 const modal = ref(false)
