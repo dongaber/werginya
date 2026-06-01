@@ -101,6 +101,12 @@ model ContactView {
   @@unique([userId, requestId])
 }
 
+model AppSettings {
+  id         Int    @id @default(1)
+  termsUrl   String @default("")
+  privacyUrl String @default("")
+}
+
 model HelpFaq {
   id       Int    @id @default(autoincrement())
   question String
