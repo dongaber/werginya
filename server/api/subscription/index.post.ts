@@ -6,10 +6,12 @@ const PLANS: Record<string, number> = {
 }
 
 export default defineEventHandler(async (event) => {
-  const body = await readBody(event)
-  const { telegramId, plan } = body
+  const telegramId = event.context.telegramId
+  if (!telegramId) throw createError({ statusCode: 401, message: 'Unauthorized' })
 
-  if (!telegramId) throw createError({ statusCode: 400, message: 'telegramId required' })
+  const body = await readBody(event)
+  const { plan } = body
+
   if (!plan || !PLANS[plan]) throw createError({ statusCode: 400, message: 'invalid plan' })
 
   const existing = await prisma.user.findUnique({

@@ -47,11 +47,10 @@
 </template>
 
 <script setup lang="ts">
-const { telegramId } = useTelegram()
-
-const { data, refresh } = await useFetch<{ active: boolean; expiresAt: string | null }>(
-  '/api/subscription',
-  { query: { telegramId: telegramId.value } }
+const { data, refresh } = await useAsyncData(
+  'subscription',
+  () => useNuxtApp().$apiFetch<{ active: boolean; expiresAt: string | null }>('/api/subscription'),
+  { server: false }
 )
 
 const isActive = computed(() => data.value?.active ?? false)
@@ -78,9 +77,10 @@ const { error: showError } = useToast()
 async function buy() {
   buying.value = true
   try {
-    await $fetch('/api/subscription', {
+    const { $apiFetch } = useNuxtApp()
+    await $apiFetch('/api/subscription', {
       method: 'POST',
-      body: { telegramId: telegramId.value, plan: selectedPlan.value },
+      body: { plan: selectedPlan.value },
     })
     await refresh()
   } catch (err) {

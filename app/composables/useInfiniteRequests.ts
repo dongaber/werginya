@@ -14,7 +14,7 @@ export function useInfiniteRequests(query: ComputedRef<Record<string, any>>) {
     if (loading.value || !hasMore.value) return
     loading.value = true
     try {
-      const result = await $fetch<any[]>('/api/requests', {
+      const result = await useNuxtApp().$apiFetch<any[]>('/api/requests', {
         query: {
           ...query.value,
           take: PAGE_SIZE,

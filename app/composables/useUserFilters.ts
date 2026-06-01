@@ -11,7 +11,7 @@ export function useUserFilters() {
     if (filters.value !== null) return
     loading.value = true
     try {
-      filters.value = await $fetch<UserFilters>('/api/user/filters')
+      filters.value = await useNuxtApp().$apiFetch<UserFilters>('/api/user/filters')
     } catch {
       filters.value = { geoCity: null, equipmentTypeIds: [] }
     } finally {
@@ -20,7 +20,7 @@ export function useUserFilters() {
   }
 
   async function save(updates: Partial<UserFilters>) {
-    await $fetch('/api/user/filters', { method: 'PATCH', body: updates })
+    await useNuxtApp().$apiFetch('/api/user/filters', { method: 'PATCH', body: updates })
     if (filters.value) {
       if (updates.geoCity !== undefined) filters.value.geoCity = updates.geoCity
       if (updates.equipmentTypeIds !== undefined) filters.value.equipmentTypeIds = updates.equipmentTypeIds

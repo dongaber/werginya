@@ -172,7 +172,7 @@ async function submit() {
       }
     }
 
-    await $fetch('/api/requests', { method: 'POST', body })
+    await useNuxtApp().$apiFetch('/api/requests', { method: 'POST', body })
     router.push('/my-requests')
   } catch (err) {
     showError(`Не удалось создать заявку: ${errMsg(err)}`)

@@ -74,7 +74,7 @@ const actionLoading = ref<number | null>(null)
 async function handleAction(id: number, status: string) {
   actionLoading.value = id
   try {
-    await $fetch(`/api/requests/${id}`, { method: 'PATCH', body: { status } })
+    await useNuxtApp().$apiFetch(`/api/requests/${id}`, { method: 'PATCH', body: { status } })
     await reset()
     showSuccess('Статус заявки обновлён')
   } catch (err) {

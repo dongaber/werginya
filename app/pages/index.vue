@@ -65,7 +65,7 @@ const viewLoading = ref<number | null>(null)
 async function handleViewContacts(id: number) {
   viewLoading.value = id
   try {
-    const contacts = await $fetch(`/api/requests/${id}/view-contacts`, { method: 'POST' })
+    const contacts = await useNuxtApp().$apiFetch(`/api/requests/${id}/view-contacts`, { method: 'POST' })
     updateItem(id, { ...contacts, contactsUnlocked: true })
     incrementViewCount()
   } catch (err: any) {

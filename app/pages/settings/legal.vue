@@ -52,7 +52,7 @@ const { success: showSuccess, error: showError } = useToast()
 async function save() {
   saving.value = true
   try {
-    await $fetch('/api/legal', {
+    await useNuxtApp().$apiFetch('/api/legal', {
       method: 'PATCH',
       body: { termsUrl: termsUrl.value, privacyUrl: privacyUrl.value },
     })

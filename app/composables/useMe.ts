@@ -12,7 +12,7 @@ export function useMe() {
   async function load() {
     if (me.value !== null) return
     try {
-      me.value = await $fetch<Me>('/api/me')
+      me.value = await useNuxtApp().$apiFetch<Me>('/api/me')
     } catch {
       me.value = { isAdmin: false, subscriptionActive: false, contactViewCount: 0 }
     }
