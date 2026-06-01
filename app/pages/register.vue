@@ -85,8 +85,9 @@ async function register() {
     const userExists = useState('userExists')
     userExists.value = true
     await router.replace('/')
-  } catch {
-    showError('Не удалось завершить регистрацию. Попробуйте ещё раз.')
+  } catch (err: any) {
+    const msg = err?.data?.message || err?.message || 'Неизвестная ошибка'
+    showError(`Ошибка регистрации: ${msg}`)
   } finally {
     loading.value = false
   }
