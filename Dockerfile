@@ -1,4 +1,4 @@
-FROM oven/bun:1-alpine AS base
+FROM oven/bun:1 AS base
 WORKDIR /app
 
 FROM base AS deps
@@ -12,7 +12,7 @@ RUN bunx prisma generate
 COPY . .
 RUN bun run build
 
-FROM base AS runner
+FROM oven/bun:1-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 
