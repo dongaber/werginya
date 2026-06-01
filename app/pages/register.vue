@@ -18,7 +18,7 @@
             <path fill="currentColor" d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
           </svg>
         </span>
-        <span class="consent__text">Согласен с <a class="consent__link" href="#" @click.prevent>офертой</a></span>
+        <span class="consent__text">Согласен с <a class="consent__link" :href="legal?.termsUrl || '#'" :target="legal?.termsUrl ? '_blank' : undefined">офертой</a></span>
       </label>
 
       <label class="consent">
@@ -28,7 +28,7 @@
             <path fill="currentColor" d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
           </svg>
         </span>
-        <span class="consent__text">Согласен на <a class="consent__link" href="#" @click.prevent>обработку персональных данных</a></span>
+        <span class="consent__text">Согласен на <a class="consent__link" :href="legal?.privacyUrl || '#'" :target="legal?.privacyUrl ? '_blank' : undefined">обработку персональных данных</a></span>
       </label>
     </div>
 
@@ -45,6 +45,8 @@
 definePageMeta({ layout: false })
 
 const { firstName, lastName, username } = useTelegram()
+
+const { data: legal } = await useFetch<{ termsUrl: string; privacyUrl: string }>('/api/legal')
 const router = useRouter()
 
 const agreedToTerms = ref(false)
