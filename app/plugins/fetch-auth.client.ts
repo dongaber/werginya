@@ -1,8 +1,6 @@
-export default defineNuxtPlugin(() => {
-  const { $telegram } = useNuxtApp()
-  const tg = $telegram as any
-
+export default defineNuxtPlugin((nuxtApp) => {
   const getHeaders = () => {
+    const tg = nuxtApp.$telegram as any
     const telegramId = tg?.initDataUnsafe?.user?.id ?? tg?.user?.id
     const initData = tg?.initData ?? ''
     const headers: Record<string, string> = {}
