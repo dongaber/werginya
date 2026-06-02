@@ -67,7 +67,7 @@ const plusIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"
   align-items: center;
   gap: 8px;
   z-index: 100;
-  margin-bottom: max(env(safe-area-inset-bottom), var(--tg-safe-area-inset-bottom, 0px));
+  margin-bottom: var(--sa-bottom);
 }
 
 .nav {

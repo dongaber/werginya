@@ -22,7 +22,7 @@ defineEmits<{ 'update:modelValue': [value: boolean] }>()
   align-items: flex-end;
   z-index: 200;
   padding: 16px;
-  padding-bottom: calc(16px + env(safe-area-inset-bottom));
+  padding-bottom: calc(16px + var(--sa-bottom));
 }
 
 .sheet {

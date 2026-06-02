@@ -30,7 +30,7 @@ const icons = {
 <style scoped>
 .toast-container {
   position: fixed;
-  top: calc(16px + max(env(safe-area-inset-top), var(--tg-content-safe-area-inset-top, 0px)));
+  top: calc(16px + var(--sa-top));
   left: 16px;
   right: 16px;
   z-index: 9999;

@@ -103,8 +103,8 @@ async function register() {
   display: flex;
   flex-direction: column;
   padding: 32px 16px 24px;
-  padding-bottom: max(24px, env(safe-area-inset-bottom), var(--tg-safe-area-inset-bottom, 0px));
-  padding-top: calc(32px + var(--tg-content-safe-area-inset-top, 0px));
+  padding-bottom: max(24px, var(--sa-bottom));
+  padding-top: calc(32px + var(--sa-top));
 }
 
 .hero {

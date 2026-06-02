@@ -17,12 +17,12 @@ const route = useRoute()
   flex-direction: column;
   min-height: 100vh;
   min-height: 100dvh;
-  padding-top: var(--tg-content-safe-area-inset-top, 0px);
+  padding-top: var(--sa-top);
 }
 
 .layout__content {
   flex: 1;
-  padding-bottom: calc(80px + max(env(safe-area-inset-bottom), var(--tg-safe-area-inset-bottom, 0px)));
+  padding-bottom: calc(80px + var(--sa-bottom));
 }
 
 .layout__content--full {
