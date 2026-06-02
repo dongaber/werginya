@@ -8,6 +8,7 @@
       </p>
 
       <AppAddressPicker
+        v-if="filtersLoaded"
         v-model="addressText"
         placeholder="Поиск адреса для навигации..."
         :init-lat="selectedLat"
@@ -71,6 +72,7 @@ const selectedLat = ref<number | null>(null)
 const selectedLng = ref<number | null>(null)
 const selectedRadius = ref<number>(50)
 const saving = ref(false)
+const filtersLoaded = ref(false)
 
 const isActive = computed(() => filters.value?.geoLat != null && filters.value?.geoRadiusKm != null)
 
@@ -83,6 +85,7 @@ onMounted(async () => {
   if (filters.value?.geoLat != null) selectedLat.value = filters.value.geoLat
   if (filters.value?.geoLng != null) selectedLng.value = filters.value.geoLng
   if (filters.value?.geoRadiusKm != null) selectedRadius.value = filters.value.geoRadiusKm
+  filtersLoaded.value = true
 })
 
 function onMapSelect(r: { value: string; lat: number | null; lng: number | null }) {

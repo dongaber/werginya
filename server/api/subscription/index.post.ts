@@ -24,6 +24,7 @@ export default defineEventHandler(async (event) => {
 
   const months = PLANS[plan]!
   const expiresAt = new Date()
+  expiresAt.setDate(1) // anchor to 1st to avoid month-end overflow (Jan 31 + 1 month = Mar 3)
   expiresAt.setMonth(expiresAt.getMonth() + months)
 
   const user = await prisma.user.update({

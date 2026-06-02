@@ -47,8 +47,11 @@ export default defineEventHandler(async (event) => {
   if (type === 'TRANSPORTATION') {
     if (!transportation) throw createError({ statusCode: 400, message: 'transportation data required' })
     const { equipmentTypeId, cargo, fromAddress, fromLat, fromLng, toAddress, toLat, toLng, startsAt, ratePerHour } = transportation
-    if (!equipmentTypeId || !cargo || !fromAddress || !toAddress || !startsAt || !ratePerHour) {
-      throw createError({ statusCode: 400, message: 'transportation: equipmentTypeId, cargo, fromAddress, toAddress, startsAt, ratePerHour required' })
+    if (!equipmentTypeId || !cargo || !fromAddress || !toAddress || !startsAt) {
+      throw createError({ statusCode: 400, message: 'transportation: equipmentTypeId, cargo, fromAddress, toAddress, startsAt required' })
+    }
+    if (ratePerHour == null || typeof ratePerHour !== 'number' || isNaN(ratePerHour) || ratePerHour < 0) {
+      throw createError({ statusCode: 400, message: 'transportation: ratePerHour must be a non-negative number' })
     }
     const data = await prisma.request.create({
       data: {
