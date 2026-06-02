@@ -212,7 +212,10 @@ const faq = computed(() => data.value?.faq ?? [])
 const contacts = computed(() => data.value?.contacts ?? [])
 
 const openIndex = ref<number | null>(null)
-const saving = ref(false)
+const savingFaq = ref(false)
+const savingContact = ref(false)
+const savingDelete = ref(false)
+const saving = computed(() => savingFaq.value || savingContact.value || savingDelete.value)
 
 // FAQ
 const faqModal = ref(false)
@@ -235,7 +238,7 @@ function openEditFaq(item: { id: number; question: string; answer: string }) {
 
 async function saveFaq() {
   if (!faqForm.question.trim() || !faqForm.answer.trim()) return
-  saving.value = true
+  savingFaq.value = true
   try {
     if (editingFaq.value) {
       await ($apiFetch as typeof $fetch)(`/api/help/faq/${editingFaq.value}`, {
@@ -254,7 +257,7 @@ async function saveFaq() {
   } catch (err) {
     showError(`Не удалось сохранить: ${errMsg(err)}`)
   } finally {
-    saving.value = false
+    savingFaq.value = false
   }
 }
 
@@ -288,7 +291,7 @@ function openEditContact(item: { id: number; label: string; type: string; value:
 
 async function saveContact() {
   if (!contactForm.label.trim() || !contactForm.value.trim() || !contactForm.url.trim()) return
-  saving.value = true
+  savingContact.value = true
   try {
     if (editingContact.value) {
       await ($apiFetch as typeof $fetch)(`/api/help/contacts/${editingContact.value}`, {
@@ -307,7 +310,7 @@ async function saveContact() {
   } catch (err) {
     showError(`Не удалось сохранить: ${errMsg(err)}`)
   } finally {
-    saving.value = false
+    savingContact.value = false
   }
 }
 
@@ -320,7 +323,7 @@ function removeContact(id: number) { confirmTarget.value = { kind: 'contact', id
 
 async function confirmDelete() {
   if (!confirmTarget.value) return
-  saving.value = true
+  savingDelete.value = true
   try {
     const { kind, id } = confirmTarget.value
     await ($apiFetch as typeof $fetch)(
@@ -333,7 +336,7 @@ async function confirmDelete() {
   } catch (err) {
     showError(`Не удалось удалить: ${errMsg(err)}`)
   } finally {
-    saving.value = false
+    savingDelete.value = false
   }
 }
 </script>
