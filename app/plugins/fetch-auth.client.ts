@@ -1,11 +1,12 @@
-export default defineNuxtPlugin((nuxtApp) => {
+import { initData } from '@tma.js/sdk'
+
+export default defineNuxtPlugin(() => {
   const getHeaders = () => {
-    const tg = nuxtApp.$telegram as any
-    const telegramId = tg?.initDataUnsafe?.user?.id ?? tg?.user?.id
-    const initData = tg?.initData ?? ''
+    const userId = initData.user()?.id
+    const rawInitData = initData.raw() ?? ''
     const headers: Record<string, string> = {}
-    if (telegramId) headers['x-telegram-id'] = String(telegramId)
-    if (initData) headers['x-init-data'] = initData
+    if (userId) headers['x-telegram-id'] = String(userId)
+    if (rawInitData) headers['x-init-data'] = rawInitData
     return headers
   }
 
