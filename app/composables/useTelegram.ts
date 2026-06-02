@@ -1,11 +1,31 @@
 import type WebApp from '@twa-dev/sdk'
 
+interface TgContact {
+  phone_number: string
+  first_name: string
+  last_name?: string
+  user_id?: number
+}
+
+// requestContact is not in @twa-dev/sdk types but exists at runtime
+interface TelegramWebApp extends typeof WebApp {
+  requestContact(callback: (sent: boolean, event?: { contact?: TgContact }) => void): void
+  initDataUnsafe: typeof WebApp.initDataUnsafe & {
+    contact?: TgContact
+  }
+}
+
 export function useTelegram() {
   const { $telegram } = useNuxtApp()
-  const tg = $telegram as typeof WebApp
+  const tg = $telegram as TelegramWebApp | undefined
 
-  const tgUser = computed(() => (tg as any)?.initDataUnsafe?.user ?? (tg as any)?.user ?? null)
-  const initData = computed(() => (tg as any)?.initData ?? '')
+  const tgUser = computed(() => tg?.initDataUnsafe?.user ?? null)
+  const initData = computed(() => tg?.initData ?? '')
+
+  // phone_number exists at runtime for users who granted contact access previously
+  const userPhone = computed<string | null>(() =>
+    (tgUser.value as (typeof tgUser.value & { phone_number?: string }) | null)?.phone_number ?? null
+  )
 
   const telegramId = computed<number>(() => tgUser.value?.id ?? 1)
   const firstName = computed<string>(() => tgUser.value?.first_name ?? 'Пользователь')
@@ -53,9 +73,21 @@ export function useTelegram() {
     tg?.BackButton.hide()
   }
 
+  function requestContact(callback: (phone: string | null) => void) {
+    if (!tg?.requestContact) { callback(null); return }
+    tg.requestContact((sent, event) => {
+      if (!sent) { callback(null); return }
+      const raw = event?.contact?.phone_number
+        ?? tg.initDataUnsafe?.contact?.phone_number
+        ?? null
+      const phone = raw ? (raw.startsWith('+') ? raw : `+${raw}`) : null
+      callback(phone)
+    })
+  }
+
   return {
-    tg,
     tgUser,
+    userPhone,
     initData,
     telegramId,
     firstName,
@@ -73,5 +105,6 @@ export function useTelegram() {
     close,
     showBackButton,
     hideBackButton,
+    requestContact,
   }
 }

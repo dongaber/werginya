@@ -1,8 +1,8 @@
 <template>
   <div class="step">
     <AppFormField label="Телефон">
-      <div v-if="phone" class="input input--readonly">
-        {{ phone }}
+      <div v-if="userPhone" class="input input--readonly">
+        {{ userPhone }}
       </div>
       <template v-else>
         <input
@@ -50,28 +50,28 @@
 <script setup lang="ts">
 const props = defineProps<{ form: Record<string, any> }>()
 
-const { tg, tgUser, username } = useTelegram()
-const phone = computed(() => (tgUser.value as any)?.phone_number ?? null)
+const { userPhone, username, requestContact } = useTelegram()
 const telegramUsername = computed(() => username.value ? `@${username.value}` : null)
 const requesting = ref(false)
 const phoneLocked = ref(false)
 
 watchEffect(() => {
-  if (phone.value && !props.form.contactPhone) props.form.contactPhone = phone.value
-  if (telegramUsername.value && !props.form.contactTelegram) props.form.contactTelegram = telegramUsername.value
+  if (userPhone.value && !props.form.contactPhone) {
+    props.form.contactPhone = userPhone.value
+    phoneLocked.value = true
+  }
+  if (telegramUsername.value && !props.form.contactTelegram) {
+    props.form.contactTelegram = telegramUsername.value
+  }
 })
 
 function requestPhone() {
-  if (!(tg as any)?.requestContact) return
   requesting.value = true
-  ;(tg as any).requestContact((status: string, data: any) => {
+  requestContact((phone) => {
     requesting.value = false
-    if (status === 'sent') {
-      const num = data?.contact?.phone_number ?? data?.responseUnsafe?.contact?.phone_number
-      if (num) {
-        props.form.contactPhone = num.startsWith('+') ? num : `+${num}`
-        phoneLocked.value = true
-      }
+    if (phone) {
+      props.form.contactPhone = phone
+      phoneLocked.value = true
     }
   })
 }
