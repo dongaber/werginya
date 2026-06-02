@@ -49,7 +49,9 @@ export function useInfiniteRequests(query: ComputedRef<Record<string, any>>) {
     onCleanup(() => observer?.disconnect())
   })
 
-  watch(query, reset, { deep: true })
+  if (import.meta.client) {
+    watch(query, reset, { deep: true, immediate: true })
+  }
 
   function updateItem(id: number, patch: Record<string, any>) {
     const idx = items.value.findIndex((item: any) => item.id === id)
