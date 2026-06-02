@@ -76,7 +76,7 @@
           <span v-else>Показать контакты (осталось {{ viewsRemaining }})</span>
         </button>
 
-        <button class="card__contacts-locked" @click="$emit('subscribe')">
+        <button v-else class="card__contacts-locked" @click="$emit('subscribe')">
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24">
             <path fill="currentColor" d="M12 1C8.676 1 6 3.676 6 7v1H4v15h16V8h-2V7c0-3.324-2.676-6-6-6zm0 2c2.276 0 4 1.724 4 4v1H8V7c0-2.276 1.724-4 4-4zm0 9a2 2 0 1 1 0 4 2 2 0 0 1 0-4z"/>
           </svg>
@@ -135,6 +135,8 @@ const showContacts = ref(false)
 const contactsVisible = computed(
   () => props.isOwner || !!props.request.contactsUnlocked
 )
+
+watch(contactsVisible, (val) => { if (val) showContacts.value = true })
 
 const ownerActions = computed(() => {
   const s = props.request.status
