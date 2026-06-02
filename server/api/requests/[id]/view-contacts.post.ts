@@ -32,7 +32,11 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    await prisma.contactView.create({ data: { userId: user.id, requestId } })
+    // Use createMany with skipDuplicates to handle concurrent requests atomically
+    await prisma.contactView.createMany({
+      data: [{ userId: user.id, requestId }],
+      skipDuplicates: true,
+    })
   }
 
   const request = await prisma.request.findUnique({
