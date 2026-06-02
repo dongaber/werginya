@@ -31,7 +31,11 @@ export function useTelegram() {
   const isDark = useSignal(miniApp.isDark)
   const colorScheme = computed(() => (isDark.value ? 'dark' : 'light'))
 
-  const userPhone = ref<string | null>(null)
+  const phoneKey = `tg_phone_${initData.user()?.id ?? 'anon'}`
+  const userPhone = useState<string | null>(
+    phoneKey,
+    () => (import.meta.client ? localStorage.getItem(phoneKey) : null),
+  )
 
   function showMainButton(text: string, onClick: () => void) {
     try {
@@ -88,7 +92,10 @@ export function useTelegram() {
       tmaRequestContact()
         .then((result) => {
           const raw = result.contact.phone_number
-          callback(raw.startsWith('+') ? raw : `+${raw}`)
+          const phone = raw.startsWith('+') ? raw : `+${raw}`
+          userPhone.value = phone
+          localStorage.setItem(phoneKey, phone)
+          callback(phone)
         })
         .catch(() => callback(null))
     } catch {
