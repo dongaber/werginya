@@ -6,6 +6,12 @@ export default defineEventHandler(async (event) => {
 
   const body = await readBody(event)
 
+  if (body.geoLat !== undefined && body.geoLat !== null && typeof body.geoLat !== 'number')
+    throw createError({ statusCode: 400, message: 'geoLat must be a number or null' })
+  if (body.geoLng !== undefined && body.geoLng !== null && typeof body.geoLng !== 'number')
+    throw createError({ statusCode: 400, message: 'geoLng must be a number or null' })
+  if (body.geoRadiusKm !== undefined && body.geoRadiusKm !== null && (typeof body.geoRadiusKm !== 'number' || body.geoRadiusKm <= 0))
+    throw createError({ statusCode: 400, message: 'geoRadiusKm must be a positive number or null' })
   if (body.equipmentTypeIds !== undefined) {
     if (!Array.isArray(body.equipmentTypeIds) || body.equipmentTypeIds.some((id: unknown) => typeof id !== 'number')) {
       throw createError({ statusCode: 400, message: 'equipmentTypeIds must be an array of numbers' })
