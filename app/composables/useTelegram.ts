@@ -34,10 +34,14 @@ export function useTelegram() {
   const userPhone = ref<string | null>(null)
 
   function showMainButton(text: string, onClick: () => void) {
-    if (!mainButton.isMounted()) mainButton.mount()
-    mainButton.setText(text)
-    mainButton.onClick(onClick)
-    mainButton.show()
+    try {
+      if (!mainButton.isMounted()) mainButton.mount()
+      mainButton.setText(text)
+      mainButton.onClick(onClick)
+      mainButton.show()
+    } catch (e) {
+      console.error('[TMA] showMainButton failed:', e)
+    }
   }
 
   function hideMainButton() {
@@ -80,12 +84,16 @@ export function useTelegram() {
   }
 
   function requestContact(callback: (phone: string | null) => void) {
-    tmaRequestContact()
-      .then((result) => {
-        const raw = result.contact.phone_number
-        callback(raw.startsWith('+') ? raw : `+${raw}`)
-      })
-      .catch(() => callback(null))
+    try {
+      tmaRequestContact()
+        .then((result) => {
+          const raw = result.contact.phone_number
+          callback(raw.startsWith('+') ? raw : `+${raw}`)
+        })
+        .catch(() => callback(null))
+    } catch {
+      callback(null)
+    }
   }
 
   return {

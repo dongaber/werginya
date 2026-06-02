@@ -43,14 +43,17 @@ export function initTMA({ eruda = false, mockForMacOS = false }: TmaInitOptions 
   themeParams.mount()
   themeParams.bindCssVars()
 
-  backButton.mount()
+  // BackButton requires Telegram >= 6.1 — skip gracefully on older clients
+  try { backButton.mount() } catch {}
 
   miniApp.mount()
 
-  viewport.mount().then(() => {
-    viewport.bindCssVars()
-    viewport.expand()
-  })
+  viewport.mount()
+    .then(() => {
+      viewport.bindCssVars()
+      viewport.expand()
+    })
+    .catch(console.error)
 
   if (eruda) {
     import('eruda').then(({ default: e }) => {
