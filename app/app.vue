@@ -1,13 +1,17 @@
 <template>
-  <AppPreloader />
-  <NuxtRouteAnnouncer />
-  <NuxtLayout>
-    <NuxtPage :transition="pageTransition" />
-  </NuxtLayout>
-  <AppToastList />
+  <AppEnvUnsupported v-if="tmaError" />
+  <template v-else>
+    <AppPreloader />
+    <NuxtRouteAnnouncer />
+    <NuxtLayout>
+      <NuxtPage :transition="pageTransition" />
+    </NuxtLayout>
+    <AppToastList />
+  </template>
 </template>
 
 <script setup lang="ts">
+const tmaError = useState('tmaError', () => false)
 const route = useRoute()
 
 const pageTransition = computed(() => {
