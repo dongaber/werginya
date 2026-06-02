@@ -1,6 +1,6 @@
 <template>
   <div class="page">
-    <AppPageHeader title="Подписка" back />
+    <AppPageHeader title="Подписка" />
 
     <!-- Status card -->
     <div class="status-card" :class="isActive ? 'status-card--active' : 'status-card--inactive'">
@@ -69,6 +69,13 @@ const plans = [
   { id: 'month_6', label: '6 месяцев', price: '1 199', per: '200 ₽/мес', badge: null },
   { id: 'month_12', label: '12 месяцев', price: '1 990', per: '166 ₽/мес', badge: 'Лучшая цена' },
 ]
+
+const router = useRouter()
+const { showBackButton, hideBackButton } = useTelegram()
+
+const handleBack = () => router.back()
+onMounted(() => showBackButton(handleBack))
+onUnmounted(() => hideBackButton(handleBack))
 
 const selectedPlan = ref('month_1')
 const buying = ref(false)
