@@ -135,13 +135,8 @@ async function nextStep() {
 const { telegramId, showBackButton, hideBackButton } = useTelegram()
 const { error: showError } = useToast()
 
-onMounted(() => { if (step.value > 0) showBackButton(prevStep) })
+onMounted(() => showBackButton(prevStep))
 onUnmounted(() => hideBackButton(prevStep))
-
-watch(step, (val) => {
-  if (val > 0) showBackButton(prevStep)
-  else hideBackButton(prevStep)
-})
 
 async function submit() {
   submitting.value = true
