@@ -33,9 +33,19 @@ const pageTransition = computed(() => {
   --tg-button-text: var(--tg-theme-button-text-color, #ffffff);
   --tg-secondary-bg: var(--tg-theme-secondary-bg-color, #f1f1f1);
 
-  /* Safe area aliases — use max() to cover both native CSS env and Telegram SDK vars */
-  --sa-top: max(env(safe-area-inset-top, 0px), var(--tg-viewport-content-safe-area-inset-top, 0px));
-  --sa-bottom: max(env(safe-area-inset-bottom, 0px), var(--tg-viewport-safe-area-inset-bottom, 0px));
+  /*
+   * Safe area aliases.
+   * SafeAreaInset   = device hardware (notch, home indicator) — same region as env(), take max of both sources.
+   * ContentSafeAreaInset = Telegram UI overlaid on content — separate zone, must be added on top.
+   */
+  --sa-top: calc(
+    max(env(safe-area-inset-top, 0px), var(--tg-viewport-safe-area-inset-top, 0px))
+    + var(--tg-viewport-content-safe-area-inset-top, 0px)
+  );
+  --sa-bottom: calc(
+    max(env(safe-area-inset-bottom, 0px), var(--tg-viewport-safe-area-inset-bottom, 0px))
+    + var(--tg-viewport-content-safe-area-inset-bottom, 0px)
+  );
 }
 
 *,
