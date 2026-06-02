@@ -1,6 +1,6 @@
 <template>
   <div class="page">
-    <AppPageHeader title="Виды техники" back>
+    <AppPageHeader title="Виды техники">
       <template #actions>
         <button class="add-btn" @click="openCreate">+</button>
       </template>
@@ -59,6 +59,12 @@
 </template>
 
 <script setup lang="ts">
+const router = useRouter()
+const { showBackButton, hideBackButton } = useTelegram()
+const handleBack = () => router.back()
+onMounted(() => showBackButton(handleBack))
+onUnmounted(() => hideBackButton(handleBack))
+
 const { $apiFetch } = useNuxtApp()
 const { error: showError, success: showSuccess } = useToast()
 

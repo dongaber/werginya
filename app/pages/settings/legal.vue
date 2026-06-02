@@ -1,6 +1,6 @@
 <template>
   <div class="page">
-    <AppPageHeader title="Правовые документы" back />
+    <AppPageHeader title="Правовые документы" />
 
     <div class="form">
       <AppFormField label="Ссылка на оферту">
@@ -34,6 +34,12 @@
 </template>
 
 <script setup lang="ts">
+const router = useRouter()
+const { showBackButton, hideBackButton } = useTelegram()
+const handleBack = () => router.back()
+onMounted(() => showBackButton(handleBack))
+onUnmounted(() => hideBackButton(handleBack))
+
 const { data, refresh } = await useAsyncData(
   'legal',
   () => useNuxtApp().$apiFetch<{ termsUrl: string; privacyUrl: string }>('/api/legal')

@@ -1,6 +1,6 @@
 <template>
   <div class="page">
-    <AppPageHeader title="Помощь" back />
+    <AppPageHeader title="Помощь" />
 
     <!-- FAQ -->
     <section class="section">
@@ -185,8 +185,12 @@
 </template>
 
 <script setup lang="ts">
+const router = useRouter()
 const { $apiFetch } = useNuxtApp()
-const { telegramId } = useTelegram()
+const { telegramId, showBackButton, hideBackButton } = useTelegram()
+const handleBack = () => router.back()
+onMounted(() => showBackButton(handleBack))
+onUnmounted(() => hideBackButton(handleBack))
 const { error: showError, success: showSuccess } = useToast()
 
 const { data: meData } = await useAsyncData(

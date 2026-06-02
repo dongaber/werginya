@@ -1,6 +1,6 @@
 <template>
   <div class="page">
-    <AppPageHeader title="Фильтр по технике" back />
+    <AppPageHeader title="Фильтр по технике" />
 
     <div v-if="pending" class="loader">
       <AppSpinner :size="32" />
@@ -46,6 +46,12 @@
 </template>
 
 <script setup lang="ts">
+const router = useRouter()
+const { showBackButton, hideBackButton } = useTelegram()
+const handleBack = () => router.back()
+onMounted(() => showBackButton(handleBack))
+onUnmounted(() => hideBackButton(handleBack))
+
 interface EquipmentType {
   id: number
   name: string

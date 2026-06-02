@@ -1,6 +1,6 @@
 <template>
   <div class="page">
-    <AppPageHeader title="Фильтр по гео" back />
+    <AppPageHeader title="Фильтр по гео" />
 
     <div class="section">
       <p class="section__hint">
@@ -62,6 +62,12 @@
 </template>
 
 <script setup lang="ts">
+const router = useRouter()
+const { showBackButton, hideBackButton } = useTelegram()
+const handleBack = () => router.back()
+onMounted(() => showBackButton(handleBack))
+onUnmounted(() => hideBackButton(handleBack))
+
 const RADIUS_OPTIONS = [10, 25, 50, 100, 200]
 
 const { filters, load, save } = useUserFilters()

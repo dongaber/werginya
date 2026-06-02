@@ -1,6 +1,6 @@
 <template>
   <div class="page">
-    <AppPageHeader :title="stepTitle" :back="step > 0" @back="prevStep" />
+    <AppPageHeader :title="stepTitle" />
 
     <!-- Progress bar -->
     <div class="progress">
@@ -135,12 +135,13 @@ async function nextStep() {
 const { telegramId, showBackButton, hideBackButton } = useTelegram()
 const { error: showError } = useToast()
 
-function handleBack() {
-  router.back()
-}
+onMounted(() => { if (step.value > 0) showBackButton(prevStep) })
+onUnmounted(() => hideBackButton(prevStep))
 
-onMounted(() => showBackButton(handleBack))
-onUnmounted(() => hideBackButton(handleBack))
+watch(step, (val) => {
+  if (val > 0) showBackButton(prevStep)
+  else hideBackButton(prevStep)
+})
 
 async function submit() {
   submitting.value = true
