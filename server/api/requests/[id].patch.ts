@@ -18,5 +18,9 @@ export default defineEventHandler(async (event) => {
     include: requestInclude,
   })
 
+  if (body.status === 'PUBLISHED') {
+    runTask('notify-new-request', { payload: { requestId: id } }).catch(() => {})
+  }
+
   return serialize(data)
 })
