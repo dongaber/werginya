@@ -1,31 +1,25 @@
-import type WebApp from '@twa-dev/sdk'
+import type { Computed } from '@tma.js/signals'
+import {
+  initData,
+  backButton,
+  mainButton,
+  hapticFeedback,
+  popup,
+  miniApp,
+  requestContact as tmaRequestContact,
+} from '@tma.js/sdk'
 
-interface TgContact {
-  phone_number: string
-  first_name: string
-  last_name?: string
-  user_id?: number
-}
-
-// requestContact is not in @twa-dev/sdk types but exists at runtime
-interface TelegramWebApp extends typeof WebApp {
-  requestContact(callback: (sent: boolean, event?: { contact?: TgContact }) => void): void
-  initDataUnsafe: typeof WebApp.initDataUnsafe & {
-    contact?: TgContact
-  }
+function useSignal<T>(signal: Computed<T>) {
+  const r = shallowRef<T>(signal())
+  const unsub = signal.sub((val) => {
+    r.value = val
+  })
+  onUnmounted(unsub)
+  return r
 }
 
 export function useTelegram() {
-  const { $telegram } = useNuxtApp()
-  const tg = $telegram as TelegramWebApp | undefined
-
-  const tgUser = computed(() => tg?.initDataUnsafe?.user ?? null)
-  const initData = computed(() => tg?.initData ?? '')
-
-  // phone_number exists at runtime for users who granted contact access previously
-  const userPhone = computed<string | null>(() =>
-    (tgUser.value as (typeof tgUser.value & { phone_number?: string }) | null)?.phone_number ?? null
-  )
+  const tgUser = useSignal(initData.user)
 
   const telegramId = computed<number>(() => tgUser.value?.id ?? 1)
   const firstName = computed<string>(() => tgUser.value?.first_name ?? 'Пользователь')
@@ -34,61 +28,69 @@ export function useTelegram() {
   const fullName = computed(() => [firstName.value, lastName.value].filter(Boolean).join(' '))
   const avatarLetter = computed(() => firstName.value[0]?.toUpperCase() ?? '?')
 
-  const colorScheme = computed(() => tg?.colorScheme ?? 'light')
-  const themeParams = computed(() => tg?.themeParams ?? {})
+  const isDark = useSignal(miniApp.isDark)
+  const colorScheme = computed(() => (isDark.value ? 'dark' : 'light'))
+
+  const userPhone = ref<string | null>(null)
 
   function showMainButton(text: string, onClick: () => void) {
-    tg?.MainButton.setText(text)
-    tg?.MainButton.onClick(onClick)
-    tg?.MainButton.show()
+    if (!mainButton.isMounted()) mainButton.mount()
+    mainButton.setText(text)
+    mainButton.onClick(onClick)
+    mainButton.show()
   }
 
   function hideMainButton() {
-    tg?.MainButton.hide()
+    mainButton.hide()
   }
 
   function showAlert(message: string) {
-    tg?.showAlert(message)
+    popup.show({ message, buttons: [{ type: 'ok' }] }).catch(() => {})
   }
 
   function showConfirm(message: string, callback: (confirmed: boolean) => void) {
-    tg?.showConfirm(message, callback)
+    popup
+      .show({
+        message,
+        buttons: [
+          { id: 'ok', type: 'ok' },
+          { id: 'cancel', type: 'cancel' },
+        ],
+      })
+      .then((buttonId) => callback(buttonId === 'ok'))
+      .catch(() => callback(false))
   }
 
   function haptic(type: 'light' | 'medium' | 'heavy' | 'rigid' | 'soft' = 'light') {
-    tg?.HapticFeedback.impactOccurred(type)
+    hapticFeedback.impactOccurred(type)
   }
 
   function close() {
-    tg?.close()
+    miniApp.close()
   }
 
   function showBackButton(onClick: () => void) {
-    tg?.BackButton.onClick(onClick)
-    tg?.BackButton.show()
+    backButton.show()
+    backButton.onClick(onClick)
   }
 
   function hideBackButton(onClick?: () => void) {
-    if (onClick) tg?.BackButton.offClick(onClick)
-    tg?.BackButton.hide()
+    if (onClick) backButton.offClick(onClick)
+    backButton.hide()
   }
 
   function requestContact(callback: (phone: string | null) => void) {
-    if (!tg?.requestContact) { callback(null); return }
-    tg.requestContact((sent, event) => {
-      if (!sent) { callback(null); return }
-      const raw = event?.contact?.phone_number
-        ?? tg.initDataUnsafe?.contact?.phone_number
-        ?? null
-      const phone = raw ? (raw.startsWith('+') ? raw : `+${raw}`) : null
-      callback(phone)
-    })
+    tmaRequestContact()
+      .then((result) => {
+        const raw = result.contact.phone_number
+        callback(raw.startsWith('+') ? raw : `+${raw}`)
+      })
+      .catch(() => callback(null))
   }
 
   return {
     tgUser,
     userPhone,
-    initData,
     telegramId,
     firstName,
     lastName,
@@ -96,7 +98,6 @@ export function useTelegram() {
     fullName,
     avatarLetter,
     colorScheme,
-    themeParams,
     showMainButton,
     hideMainButton,
     showAlert,
